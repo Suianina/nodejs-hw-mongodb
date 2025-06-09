@@ -1,9 +1,6 @@
-const {
-  getAllContacts,
-  getContactById,
-} = require('../services/contacts');
+import { getAllContacts, getContactById } from '../services/contacts.js';
 
-async function handleGetAllContacts(req, res) {
+export async function handleGetAllContacts(req, res) {
   const contacts = await getAllContacts();
   res.status(200).json({
     status: 200,
@@ -12,7 +9,7 @@ async function handleGetAllContacts(req, res) {
   });
 }
 
-async function handleGetContactById(req, res) {
+export async function handleGetContactById(req, res) {
   const { contactId } = req.params;
   const contact = await getContactById(contactId);
 
@@ -26,8 +23,3 @@ async function handleGetContactById(req, res) {
     data: contact,
   });
 }
-
-module.exports = {
-  handleGetAllContacts,
-  handleGetContactById,
-};

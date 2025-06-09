@@ -1,17 +1,16 @@
-const express = require('express');
-const cors = require('cors');
-const pino = require('pino-http')();
-
-const {
+import express from 'express';
+import cors from 'cors';
+import pino from 'pino-http';
+import {
   handleGetAllContacts,
   handleGetContactById,
-} = require('./controllers/contactsController');
+} from './controllers/contactsController.js';
 
 function setupServer() {
   const app = express();
 
   app.use(cors());
-  app.use(pino);
+  app.use(pino());
   app.use(express.json());
 
   app.get('/contacts', handleGetAllContacts);
@@ -27,4 +26,4 @@ function setupServer() {
   });
 }
 
-module.exports = setupServer;
+export default setupServer;

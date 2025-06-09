@@ -1,4 +1,6 @@
-const { Schema, model } = require('mongoose');
+import mongoose from 'mongoose';
+
+const { Schema, model } = mongoose;
 
 const contactSchema = new Schema(
   {
@@ -13,7 +15,7 @@ const contactSchema = new Schema(
       default: 'personal',
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-module.exports = model('Contact', contactSchema);
+export default model('Contact', contactSchema);
