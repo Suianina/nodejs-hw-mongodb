@@ -15,7 +15,8 @@ const contactSchema = new Schema(
       default: 'personal',
     },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 export default model('Contact', contactSchema);
+
