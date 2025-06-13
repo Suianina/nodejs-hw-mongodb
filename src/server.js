@@ -12,6 +12,14 @@ export default function setupServer() {
   app.use(cors());
   app.use(express.json());
 
+  app.get('/', (req, res) => {
+    res.status(200).json({
+      status: 200,
+      message: 'Contacts API is running',
+      timestamp: new Date()
+    });
+  });
+
   app.use('/contacts', contactsRouter);
   app.use(notFoundHandler);
   app.use(errorHandler);
