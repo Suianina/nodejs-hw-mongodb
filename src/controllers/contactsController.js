@@ -5,7 +5,6 @@ import {
   updateContact,
   deleteContact,
 } from '../services/contacts.js';
-import createHttpError from 'http-errors';
 
 export const handleGetAllContacts = async (req, res) => {
   const contacts = await getAllContacts();
@@ -19,7 +18,6 @@ export const handleGetAllContacts = async (req, res) => {
 export const handleGetContactById = async (req, res) => {
   const { contactId } = req.params;
   const contact = await getContactById(contactId);
-  if (!contact) throw createHttpError(404, 'Contact not found');
 
   res.status(200).json({
     status: 200,
@@ -40,19 +38,16 @@ export const handleCreateContact = async (req, res) => {
 export const handleUpdateContact = async (req, res) => {
   const { contactId } = req.params;
   const updatedContact = await updateContact(contactId, req.body);
-  if (!updatedContact) throw createHttpError(404, 'Contact not found');
 
   res.status(200).json({
     status: 200,
-    message: 'Successfully updated contact!',
+    message: `Successfully updated contact with id ${contactId}!`,
     data: updatedContact,
   });
 };
 
 export const handleDeleteContact = async (req, res) => {
   const { contactId } = req.params;
-  const deleted = await deleteContact(contactId);
-  if (!deleted) throw createHttpError(404, 'Contact not found');
-
+  await deleteContact(contactId);
   res.status(204).send();
 };
