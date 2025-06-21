@@ -1,10 +1,32 @@
 import createHttpError from 'http-errors';
 import Contact from '../models/contact.js';
 
-export const getAllContacts = async (query = {}) => {
-  const contacts = await Contact.find(query);
-  if (!contacts.length) throw createHttpError(404, 'No contacts found!');
-  return contacts;
+export const getAllContacts = async ({ page, perPage, sortBy, sortOrder, filter }) => {
+  const skip = (page - 1) * perPage;
+  const sort = { [sortBy]: sortOrder === 'desc' ? -1 : 1 };
+
+  const query = {};
+  if (filter.type) query.contactType = filter.type;
+  if (filter.isFavourite !== undefined) query.isFavourite = filter.isFavourite;
+
+  const totalItems = await Contact.countDocuments(query);
+  const totalPages = Math.ceil(totalItems / perPage);
+
+
+  const contacts = await Contact.find(query)
+    .sort(sort)
+    .skip(skip)
+    .limit(perPage);
+
+  return {
+    data: contacts,
+    page,
+    perPage,
+    totalItems,
+    totalPages,
+    hasPreviousPage: page > 1,
+    hasNextPage: page < totalPages,
+  };
 };
 
 export const getContactById = async (id) => {
@@ -13,7 +35,7 @@ export const getContactById = async (id) => {
   return contact;
 };
 
-export const createContact = async (data) => {
+export const addContact = async (data) => {
   return Contact.create(data);
 };
 
