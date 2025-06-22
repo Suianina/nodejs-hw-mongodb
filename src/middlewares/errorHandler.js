@@ -1,38 +1,20 @@
-import { isHttpError } from 'http-errors';
-import { MongooseError } from 'mongoose';
+import { HttpError } from 'http-errors';
 
-export const errorHandler = (err, req, res, next) => {
-  console.error(err);
+export const errorHandler = (error, req, res, next) => {
+  console.error('Error:', error);
 
-  if (err.isJoi) {
-    return res.status(400).json({
-      status: 400,
-      message: 'Validation error',
-      details: err.details.map(({ path, message }) => ({ path, message })),
-      requestId: req.id,
-    });
-  }
-
-  if (isHttpError(err)) {
-    return res.status(err.status).json({
-      status: err.status,
-      message: err.message,
-      requestId: req.id,
-    });
-  }
-
-  if (err instanceof MongooseError) {
-    return res.status(500).json({
-      status: 500,
-      message: 'Database error',
-      details: err.message,
-      requestId: req.id,
+  if (error instanceof HttpError) {
+    return res.status(error.status || 500).json({
+      status: error.status || 500,
+      message: error.message,
+      ...(error.details && { errors: error.details }), // Додаємо деталі помилок
+      data: null,
     });
   }
 
   res.status(500).json({
     status: 500,
-    message: 'Internal server error',
-    requestId: req.id,
+    message: 'Internal Server Error',
+    data: null,
   });
 };

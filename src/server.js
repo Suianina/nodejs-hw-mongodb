@@ -1,36 +1,34 @@
-import express from 'express';
+import express, { json } from 'express';
 import cors from 'cors';
-import pino from 'pino-http';
+
+import { env } from './utils/env.js';
 import contactsRouter from './routers/contacts.js';
+import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandler } from './middlewares/errorHandler.js';
-import notFoundHandler from './middlewares/notFoundHandler.js';
-import { randomUUID } from 'node:crypto';
+import { logger } from './middlewares/logger.js';
 
-export default function setupServer() {
+const PORT = Number(env('PORT', '3040'));
+
+export const setupServer = () => {
   const app = express();
-
-  app.use((req, res, next) => {
-    req.id = randomUUID();
-    next();
-  });
-
-  app.use(pino());
-  app.use(cors());
   app.use(express.json());
+  app.use(cors());
+
+  app.use(logger);
 
   app.get('/', (req, res) => {
-    res.status(200).json({
-      status: 200,
-      message: 'Contacts API is running',
-      timestamp: new Date(),
-      requestId: req.id
+    res.json({
+      message: 'Contacts',
     });
   });
 
   app.use('/contacts', contactsRouter);
+  app.use('/contacts/:contactId', contactsRouter);
+
   app.use(notFoundHandler);
   app.use(errorHandler);
 
-  return app;
-}
-
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+};

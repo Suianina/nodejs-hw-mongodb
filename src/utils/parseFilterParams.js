@@ -1,7 +1,32 @@
-export const parseFilterParams = ({ type, isFavourite }) => {
-  const allowedTypes = ['work', 'home', 'personal'];
+const parseType = (type) => {
+  if (typeof type !== 'string') {
+    return undefined;
+  }
+
+  const validTypes = ['work', 'home', 'personal'];
+
+  return validTypes.includes(type.toLowerCase())
+    ? type.toLowerCase()
+    : undefined;
+};
+
+const parseIsFavorite = (value) => {
+  if (typeof value !== 'string') return undefined;
+
+  if (value.toLowerCase() === 'true') return true;
+  if (value.toLowerCase() === 'false') return false;
+
+  return undefined;
+};
+
+export const parseFilterParams = (query) => {
+  const { type, isFavourite } = query;
+
+  const parsedType = parseType(type);
+  const parsedIsFavourite = parseIsFavorite(isFavourite);
+
   return {
-    type: allowedTypes.includes(type?.toLowerCase()) ? type.toLowerCase() : undefined,
-    isFavourite: isFavourite === 'true' ? true : isFavourite === 'false' ? false : undefined,
+    type: parsedType,
+    isFavourite: parsedIsFavourite,
   };
 };

@@ -1,18 +1,23 @@
 import { isValidObjectId } from 'mongoose';
 import createHttpError from 'http-errors';
-import Contact from '../models/contact.js';
 
-export const isValidId = async (req, res, next) => {
+export const isValidId = (req, res, next) => {
   const { contactId } = req.params;
 
   if (!isValidObjectId(contactId)) {
-    throw createHttpError(400, 'Invalid MongoDB ID');
+    return next(
+      createHttpError(400, {
+        status: 400,
+        message: 'Invalid ID format',
+        errors: [
+          {
+            message: 'Invalid ID format',
+            path: 'contactId',
+            type: 'validation',
+          },
+        ],
+      }),
+    );
   }
-
-  const contactExists = await Contact.exists({ _id: contactId });
-  if (!contactExists) {
-    throw createHttpError(404, 'Contact not found');
-  }
-
   next();
 };

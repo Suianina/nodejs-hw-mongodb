@@ -1,4 +1,18 @@
-export const parsePaginationParams = ({ page = '1', perPage = '10' }) => ({
-  page: Math.max(Number.parseInt(page) || 1, 1),
-  perPage: Math.max(Number.parseInt(perPage) || 10, 1),
-});
+const parseNumber = (number, defaultValue) => {
+  if (typeof number !== 'string') return defaultValue;
+
+  const parsedNumber = parseInt(number, 10);
+  return Number.isNaN(parsedNumber) ? defaultValue : parsedNumber;
+};
+
+export const parsePaginationParams = (query) => {
+  const { page, perPage } = query;
+
+  const parsedPage = parseNumber(page, 1);
+  const parsedPerPage = parseNumber(perPage, 10);
+
+  return {
+    page: parsedPage,
+    perPage: parsedPerPage,
+  };
+};
