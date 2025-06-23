@@ -1,3 +1,5 @@
+import createHttpError from 'http-errors';
+
 export const validateBody = (schema) => (req, res, next) => {
   const { error } = schema.validate(req.body, {
     abortEarly: false,
@@ -16,14 +18,11 @@ export const validateBody = (schema) => (req, res, next) => {
       },
     }));
 
-    return res.status(400).json({
-      status: 400,
-      message: 'BadRequestError',
-      data: {
-        message: 'Bad request',
-        errors,
-      },
-    });
+    return next(
+      createHttpError(400, 'BadRequestError', {
+        details: errors,
+      }),
+    );
   }
 
   next();
