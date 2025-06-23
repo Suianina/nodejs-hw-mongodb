@@ -10,11 +10,19 @@ export const getAllContacts = async ({
   const skip = (page - 1) * perPage;
 
   const filterQuery = {};
+
   if (typeof filter.type !== 'undefined') {
     filterQuery.contactType = filter.type;
   }
+
   if (typeof filter.isFavourite !== 'undefined') {
     filterQuery.isFavourite = filter.isFavourite;
+  }
+
+  if (filter.email === null) {
+    filterQuery.email = { $eq: null, $exists: true };
+  } else if (typeof filter.email !== 'undefined') {
+    filterQuery.email = filter.email;
   }
 
   const totalItems = await ContactsCollection.countDocuments(filterQuery);
@@ -40,7 +48,12 @@ export const getAllContacts = async ({
 };
 
 export const addContact = async (payload) => {
-  return await ContactsCollection.create(payload);
+  const data = {
+    ...payload,
+    email: payload.email ?? null,
+  };
+
+  return await ContactsCollection.create(data);
 };
 
 export const getContactById = async (contactId) => {

@@ -7,10 +7,14 @@ import {
   updateContactsSchema,
 } from '../validation/contacts.js';
 import ctrlWrapper from '../utils/ctrlWrapper.js';
+import { validateQueryParams } from '../middlewares/validateQueryParams.js';
 
 const contactsRouter = Router();
-
-contactsRouter.get('/', ctrlWrapper(contactControllers.getContactsController));
+contactsRouter.get(
+  '/',
+  validateQueryParams,
+  ctrlWrapper(contactControllers.getContactsController),
+);
 
 contactsRouter.get(
   '/:contactId',
