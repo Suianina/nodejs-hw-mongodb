@@ -31,9 +31,16 @@ export const getContactsController = async (req, res, next) => {
       filter,
     });
 
+    if (page > totalPages && totalPages !== 0) {
+      throw createHttpError(
+        400,
+        `Page ${page} does not exist. Total pages: ${totalPages}.`,
+      );
+    }
+
     res.status(200).json({
       status: 200,
-      message: 'Successfully found contacts!',
+      message: 'Contacts retrieved successfully!',
       data: {
         data: contacts,
         page,
@@ -65,7 +72,7 @@ export const getContactByIdController = async (req, res, next) => {
 
     res.json({
       status: 200,
-      message: `Successfully found contact with id ${contactId}!`,
+      message: `Successfully found contact with ID ${contactId}!`,
       data: contact,
     });
   } catch (error) {
@@ -78,7 +85,7 @@ export const addContactController = async (req, res, next) => {
     const contact = await addContact(req.body);
     res.status(201).json({
       status: 201,
-      message: 'Successfully created a contact!',
+      message: 'Contact successfully created!',
       data: contact,
     });
   } catch (error) {
@@ -102,7 +109,7 @@ export const patchContactController = async (req, res, next) => {
 
     res.json({
       status: 200,
-      message: 'Successfully patched a contact!',
+      message: 'Contact successfully updated!',
       data: updatedContact,
     });
   } catch (error) {
