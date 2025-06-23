@@ -5,8 +5,8 @@ import {
   updateContact,
   deleteContact,
 } from '../services/contacts.js';
+
 import createHttpError from 'http-errors';
-import mongoose from 'mongoose';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseFilterParams } from '../utils/parseFilterParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
@@ -60,10 +60,6 @@ export const getContactByIdController = async (req, res, next) => {
   try {
     const { contactId } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(contactId)) {
-      throw createHttpError(400, 'Invalid contact ID format');
-    }
-
     const contact = await getContactById(contactId);
 
     if (!contact) {
@@ -97,15 +93,12 @@ export const patchContactController = async (req, res, next) => {
   try {
     const { contactId } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(contactId)) {
-      throw createHttpError(400, 'Invalid contact ID format');
+    const existingContact = await getContactById(contactId);
+    if (!existingContact) {
+      throw createHttpError(404, 'Contact not found');
     }
 
     const updatedContact = await updateContact(contactId, req.body);
-
-    if (!updatedContact) {
-      throw createHttpError(404, 'Contact not found');
-    }
 
     res.json({
       status: 200,
@@ -117,21 +110,45 @@ export const patchContactController = async (req, res, next) => {
   }
 };
 
+export const putContactController = async (req, res, next) => {
+  try {
+    const { contactId } = req.params;
+    const existingContact = await getContactById(contactId);
+    if (!existingContact) {
+      throw createHttpError(404, 'Contact not found');
+    }
+
+    const updatedContact = await updateContact(contactId, req.body);
+
+    res.json({
+      status: 200,
+      message: 'Contact successfully replaced!',
+      data: updatedContact,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const deleteContactController = async (req, res, next) => {
   try {
     const { contactId } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(contactId)) {
-      throw createHttpError(400, 'Invalid contact ID format');
-    }
-
     const contact = await deleteContact(contactId);
 
     if (!contact) {
-      throw createHttpError(404, 'Contact not found');
+      return res.status(404).json({
+        status: 404,
+        message: 'Contact not found',
+        data: null,
+      });
     }
 
-    res.status(204).send();
+    res.status(200).json({
+      status: 200,
+      message: 'Contact successfully deleted!',
+      data: contact,
+    });
   } catch (error) {
     next(error);
   }

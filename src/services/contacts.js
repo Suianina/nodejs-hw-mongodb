@@ -48,12 +48,7 @@ export const getAllContacts = async ({
 };
 
 export const addContact = async (payload) => {
-  const data = {
-    ...payload,
-    email: payload.email ?? null,
-  };
-
-  return await ContactsCollection.create(data);
+  return await ContactsCollection.create(payload);
 };
 
 export const getContactById = async (contactId) => {

@@ -10,6 +10,7 @@ import ctrlWrapper from '../utils/ctrlWrapper.js';
 import { validateQueryParams } from '../middlewares/validateQueryParams.js';
 
 const contactsRouter = Router();
+
 contactsRouter.get(
   '/',
   validateQueryParams,
@@ -33,6 +34,13 @@ contactsRouter.patch(
   isValidId,
   validateBody(updateContactsSchema),
   ctrlWrapper(contactControllers.patchContactController),
+);
+
+contactsRouter.put(
+  '/:contactId',
+  isValidId,
+  validateBody(createContactsSchema),
+  ctrlWrapper(contactControllers.putContactController),
 );
 
 contactsRouter.delete(

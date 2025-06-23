@@ -28,7 +28,9 @@ const parseEmail = (value) => {
 
   const cleaned = value.trim().toLowerCase();
 
-  if (cleaned === 'null') return null;
+  if (cleaned === 'null') {
+    return null;
+  }
 
   if (!isValidEmail(cleaned)) {
     throw createHttpError(400, {
@@ -47,17 +49,11 @@ const parseEmail = (value) => {
 };
 
 export const parseFilterParams = (query) => {
-  const typeValue = query.type || query.contactType;
-  const isFavourite = query.isFavourite;
-  const email = query.email;
-
-  const parsedType = parseType(typeValue);
-  const parsedIsFavourite = parseIsFavorite(isFavourite);
-  const parsedEmail = parseEmail(email);
-
   return {
-    type: parsedType,
-    isFavourite: parsedIsFavourite,
-    email: parsedEmail,
+    type: parseType(query.type),
+    isFavorite: parseIsFavorite(query.favorite),
+    email: parseEmail(query.email),
   };
 };
+
+export { parseType, parseIsFavorite, parseEmail, isValidEmail };
