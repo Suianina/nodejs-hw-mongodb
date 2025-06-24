@@ -38,9 +38,14 @@ export const getContactsController = async (req, res, next) => {
       );
     }
 
+    const responseMessage =
+      contacts.length === 0
+        ? 'No contacts match the provided filters.'
+        : 'Contacts retrieved successfully!';
+
     res.status(200).json({
       status: 200,
-      message: 'Contacts retrieved successfully!',
+      message: responseMessage,
       data: {
         data: contacts,
         page,

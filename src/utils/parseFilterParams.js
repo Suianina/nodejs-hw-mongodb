@@ -1,15 +1,15 @@
 import createHttpError from 'http-errors';
 
-const parseType = (type) => {
-  if (typeof type !== 'string') return undefined;
+const parseContactType = (contactType) => {
+  if (typeof contactType !== 'string') return undefined;
 
   const validTypes = ['work', 'home', 'personal'];
-  return validTypes.includes(type.toLowerCase())
-    ? type.toLowerCase()
+  return validTypes.includes(contactType.toLowerCase())
+    ? contactType.toLowerCase()
     : undefined;
 };
 
-const parseIsFavorite = (value) => {
+const parseIsFavourite = (value) => {
   if (typeof value !== 'string') return undefined;
 
   if (value.toLowerCase() === 'true') return true;
@@ -50,10 +50,10 @@ const parseEmail = (value) => {
 
 export const parseFilterParams = (query) => {
   return {
-    type: parseType(query.type),
-    isFavorite: parseIsFavorite(query.favorite),
+    contactType: parseContactType(query.contactType),
+    isFavourite: parseIsFavourite(query.favorite),
     email: parseEmail(query.email),
   };
 };
 
-export { parseType, parseIsFavorite, parseEmail, isValidEmail };
+export { parseContactType, parseIsFavourite, parseEmail, isValidEmail };

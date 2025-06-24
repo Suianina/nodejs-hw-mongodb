@@ -11,8 +11,8 @@ export const getAllContacts = async ({
 
   const filterQuery = {};
 
-  if (typeof filter.type !== 'undefined') {
-    filterQuery.contactType = filter.type;
+  if (typeof filter.contactType !== 'undefined') {
+    filterQuery.contactType = filter.contactType;
   }
 
   if (typeof filter.isFavourite !== 'undefined') {
