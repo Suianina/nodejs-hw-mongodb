@@ -5,8 +5,16 @@ const validSortFields = ['_id', 'name', 'createdAt', 'isFavourite'];
 const validSortOrders = ['asc', 'desc'];
 
 export const validateQueryParams = (req, res, next) => {
-  const { sortBy, sortOrder, type, isFavourite, email, page, perPage } =
-    req.query;
+  const {
+    sortBy,
+    sortOrder,
+    type,
+    isFavourite,
+    email,
+    phoneNumber,
+    page,
+    perPage,
+  } = req.query;
 
   const errors = [];
 
@@ -46,6 +54,14 @@ export const validateQueryParams = (req, res, next) => {
     errors.push({
       message: `Invalid email value`,
       path: ['email'],
+      type: 'invalid.query.param',
+    });
+  }
+
+  if (phoneNumber && typeof phoneNumber !== 'string') {
+    errors.push({
+      message: `Invalid phoneNumber value`,
+      path: ['phoneNumber'],
       type: 'invalid.query.param',
     });
   }

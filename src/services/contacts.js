@@ -8,7 +8,6 @@ export const getAllContacts = async ({
   filter = {},
 }) => {
   const skip = (page - 1) * perPage;
-
   const filterQuery = {};
 
   if (typeof filter.contactType !== 'undefined') {
@@ -23,6 +22,10 @@ export const getAllContacts = async ({
     filterQuery.email = { $eq: null, $exists: true };
   } else if (typeof filter.email !== 'undefined') {
     filterQuery.email = filter.email;
+  }
+
+  if (typeof filter.phoneNumber !== 'undefined') {
+    filterQuery.phoneNumber = filter.phoneNumber;
   }
 
   const totalItems = await ContactsCollection.countDocuments(filterQuery);
