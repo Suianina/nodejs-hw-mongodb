@@ -8,8 +8,11 @@ import {
 } from '../validation/contacts.js';
 import ctrlWrapper from '../utils/ctrlWrapper.js';
 import { validateQueryParams } from '../middlewares/validateQueryParams.js';
+import { authenticate } from '../middlewares/authenticate.js'; // ✅
 
 const contactsRouter = Router();
+
+contactsRouter.use(authenticate);
 
 contactsRouter.get(
   '/',

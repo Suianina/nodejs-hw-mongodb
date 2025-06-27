@@ -1,0 +1,84 @@
+import bcrypt from 'bcryptjs';
+import createHttpError from 'http-errors';
+import { User } from '../db/models/user.js';
+import { Session } from '../db/models/session.js';
+import { env } from '../utils/env.js';
+
+const ACCESS_TOKEN_SECRET = env('ACCESS_TOKEN_SECRET');
+const REFRESH_TOKEN_SECRET = env('REFRESH_TOKEN_SECRET');
+
+export const registerService = async ({ name, email, password }) => {
+  const existingUser = await User.findOne({ email });
+  if (existingUser) throw createHttpError(409, 'Email in use');
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const user = await User.create({ name, email, password: hashedPassword });
+
+  const userObject = user.toObject();
+  delete userObject.password;
+
+  return userObject;
+};
+
+export const loginService = async ({ email, password }) => {
+  const user = await User.findOne({ email });
+  if (!user) throw createHttpError(401, 'Invalid email or password');
+
+  const passwordMatch = await bcrypt.compare(password, user.password);
+  if (!passwordMatch) throw createHttpError(401, 'Invalid email or password');
+
+  await Session.deleteMany({ userId: user._id });
+
+  const accessToken = jwt.sign({ id: user._id }, ACCESS_TOKEN_SECRET, {
+    expiresIn: '15m',
+  });
+  const refreshToken = jwt.sign({ id: user._id }, REFRESH_TOKEN_SECRET, {
+    expiresIn: '30d',
+  });
+
+  const session = await Session.create({
+    userId: user._id,
+    accessToken,
+    refreshToken,
+    accessTokenValidUntil: new Date(Date.now() + 15 * 60 * 1000),
+    refreshTokenValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+  });
+
+  return { accessToken, refreshToken };
+};
+
+export const refreshService = async (refreshToken) => {
+  if (!refreshToken) throw createHttpError(401, 'No refresh token');
+
+  const session = await Session.findOne({ refreshToken });
+  if (!session) throw createHttpError(401, 'Invalid session');
+
+  if (session.refreshTokenValidUntil < new Date()) {
+    throw createHttpError(401, 'Refresh token expired');
+  }
+
+  const userId = session.userId;
+  await Session.deleteOne({ _id: session._id });
+
+  const newAccessToken = jwt.sign({ id: userId }, ACCESS_TOKEN_SECRET, {
+    expiresIn: '15m',
+  });
+  const newRefreshToken = jwt.sign({ id: userId }, REFRESH_TOKEN_SECRET, {
+    expiresIn: '30d',
+  });
+
+  await Session.create({
+    userId,
+    accessToken: newAccessToken,
+    refreshToken: newRefreshToken,
+    accessTokenValidUntil: new Date(Date.now() + 15 * 60 * 1000),
+    refreshTokenValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+  });
+
+  return newAccessToken;
+};
+
+export const logoutService = async (refreshToken) => {
+  if (!refreshToken) return;
+  await Session.deleteOne({ refreshToken });
+};
