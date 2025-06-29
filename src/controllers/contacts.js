@@ -38,7 +38,7 @@ export const getContactsController = async (req, res, next) => {
     const responseMessage =
       contacts.length === 0
         ? 'No contacts match the provided filters.'
-        : 'Contacts retrieved successfully!';
+        : 'Successfully retrieved contacts!';
 
     res.status(200).json({
       status: 200,
@@ -69,7 +69,7 @@ export const getContactByIdController = async (req, res, next) => {
 
     res.json({
       status: 200,
-      message: `Successfully found contact with ID ${contactId}!`,
+      message: `Successfully retrieved a contact with ID ${contactId}!`,
       data: contact,
     });
   } catch (error) {
@@ -86,7 +86,7 @@ export const addContactController = async (req, res, next) => {
 
     res.status(201).json({
       status: 201,
-      message: 'Contact successfully created!',
+      message: 'Successfully created a contact!',
       data: contact,
     });
   } catch (error) {
@@ -110,7 +110,7 @@ export const patchContactController = async (req, res, next) => {
 
     res.json({
       status: 200,
-      message: 'Contact successfully updated!',
+      message: 'Successfully updated a contact!',
       data: updatedContact,
     });
   } catch (error) {
@@ -134,7 +134,7 @@ export const putContactController = async (req, res, next) => {
 
     res.json({
       status: 200,
-      message: 'Contact successfully replaced!',
+      message: 'Successfully replaced a contact!',
       data: updatedContact,
     });
   } catch (error) {
@@ -158,7 +158,7 @@ export const deleteContactController = async (req, res, next) => {
 
     res.status(200).json({
       status: 200,
-      message: 'Contact successfully deleted!',
+      message: 'Successfully deleted a contact!',
       data: contact,
     });
   } catch (error) {
