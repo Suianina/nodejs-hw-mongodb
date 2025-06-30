@@ -31,7 +31,7 @@ export const registerService = async ({ name, email, password }) => {
   const existingUser = await User.findOne({ email });
   if (existingUser) throw createHttpError(409, 'Email in use');
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await bcrypt.hash(password, 12);
   const user = await User.create({ name, email, password: hashedPassword });
 
   return user;
@@ -47,31 +47,37 @@ export const loginService = async ({ email, password }) => {
   await Session.deleteMany({ userId: user._id });
 
   const tokens = generateTokens(user._id);
-
-  await Session.create({ userId: user._id, ...tokens });
+  const session = await Session.create({ userId: user._id, ...tokens });
 
   return {
     accessToken: tokens.accessToken,
     refreshToken: tokens.refreshToken,
+    sessionId: session._id,
   };
 };
 
 export const refreshService = async (refreshToken) => {
   if (!refreshToken) throw createHttpError(401, 'No refresh token');
 
-  const session = await Session.findOne({ refreshToken });
+  let payload;
+  try {
+    payload = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
+  } catch {
+    throw createHttpError(401, 'Invalid or expired refresh token');
+  }
+
+  const userId = payload.id;
+
+  const session = await Session.findOne({ userId, refreshToken });
   if (!session) throw createHttpError(401, 'Invalid session');
 
   if (session.refreshTokenValidUntil < new Date()) {
     throw createHttpError(401, 'Refresh token expired');
   }
 
-  const userId = session.userId;
-
   await Session.deleteOne({ _id: session._id });
 
   const tokens = generateTokens(userId);
-
   await Session.create({ userId, ...tokens });
 
   return tokens;
@@ -79,5 +85,10 @@ export const refreshService = async (refreshToken) => {
 
 export const logoutService = async (refreshToken) => {
   if (!refreshToken) return;
-  await Session.deleteOne({ refreshToken });
+
+  const session = await Session.findOneAndDelete({ refreshToken });
+
+  if (!session) {
+    console.warn('⚠️ No session found to logout');
+  }
 };

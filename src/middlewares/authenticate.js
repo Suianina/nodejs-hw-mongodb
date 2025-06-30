@@ -1,6 +1,10 @@
 import createHttpError from 'http-errors';
+import jwt from 'jsonwebtoken';
 import { Session } from '../db/models/session.js';
 import { User } from '../db/models/user.js';
+import { env } from '../utils/env.js';
+
+const ACCESS_TOKEN_SECRET = env('ACCESS_TOKEN_SECRET');
 
 export const authenticate = async (req, res, next) => {
   const authHeader = req.get('Authorization');
@@ -13,8 +17,15 @@ export const authenticate = async (req, res, next) => {
     return next(createHttpError(401, 'Invalid Authorization header'));
   }
 
+  try {
+    jwt.verify(token, ACCESS_TOKEN_SECRET);
+  } catch {
+    return next(createHttpError(401, 'Invalid access token'));
+  }
+
   const session = await Session.findOne({ accessToken: token });
   if (!session) return next(createHttpError(401, 'Session not found'));
+
   if (session.accessTokenValidUntil < new Date()) {
     return next(createHttpError(401, 'Access token expired'));
   }
