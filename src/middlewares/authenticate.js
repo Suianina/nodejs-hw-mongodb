@@ -17,13 +17,20 @@ export const authenticate = async (req, res, next) => {
     return next(createHttpError(401, 'Invalid Authorization header'));
   }
 
+  let payload;
   try {
-    jwt.verify(token, ACCESS_TOKEN_SECRET);
-  } catch {
+    payload = jwt.verify(token, ACCESS_TOKEN_SECRET);
+  } catch (err) {
+    if (err.name === 'TokenExpiredError') {
+      return next(createHttpError(401, 'Access token expired'));
+    }
     return next(createHttpError(401, 'Invalid access token'));
   }
 
-  const session = await Session.findOne({ accessToken: token });
+  const session = await Session.findOne({
+    userId: payload.id,
+    accessToken: token,
+  });
   if (!session) return next(createHttpError(401, 'Session not found'));
 
   if (session.accessTokenValidUntil < new Date()) {
