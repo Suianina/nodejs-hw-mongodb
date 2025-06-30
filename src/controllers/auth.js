@@ -19,6 +19,13 @@ const setupSessionCookies = (res, tokens) => {
     sameSite: 'lax',
     maxAge: 15 * 60 * 1000,
   });
+
+  res.cookie('sessionId', tokens.sessionId, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+  });
 };
 
 export const register = async (req, res) => {
@@ -33,6 +40,7 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   const tokens = await loginService(req.body);
+
   setupSessionCookies(res, tokens);
 
   res.status(200).json({
@@ -46,6 +54,7 @@ export const login = async (req, res) => {
 
 export const refresh = async (req, res) => {
   const refreshToken = req.cookies?.refreshToken;
+
   const tokens = await refreshService(refreshToken);
 
   setupSessionCookies(res, tokens);
@@ -65,6 +74,7 @@ export const logout = async (req, res) => {
 
   res.clearCookie('refreshToken');
   res.clearCookie('accessToken');
+  res.clearCookie('sessionId');
 
   res.status(204).send();
 };

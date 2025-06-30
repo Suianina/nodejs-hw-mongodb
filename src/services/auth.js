@@ -15,6 +15,7 @@ const generateTokens = (userId) => {
   const accessToken = jwt.sign({ id: userId }, ACCESS_TOKEN_SECRET, {
     expiresIn: '15m',
   });
+
   const refreshToken = jwt.sign({ id: userId }, REFRESH_TOKEN_SECRET, {
     expiresIn: '30d',
   });
@@ -34,7 +35,13 @@ export const registerService = async ({ name, email, password }) => {
   const hashedPassword = await bcrypt.hash(password, 12);
   const user = await User.create({ name, email, password: hashedPassword });
 
-  return user;
+  return {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+  };
 };
 
 export const loginService = async ({ email, password }) => {
@@ -47,11 +54,14 @@ export const loginService = async ({ email, password }) => {
   await Session.deleteMany({ userId: user._id });
 
   const tokens = generateTokens(user._id);
-  await Session.create({ userId: user._id, ...tokens });
+  const session = await Session.create({
+    userId: user._id,
+    ...tokens,
+  });
 
   return {
-    accessToken: tokens.accessToken,
-    refreshToken: tokens.refreshToken,
+    ...tokens,
+    sessionId: session._id.toString(),
   };
 };
 
@@ -77,17 +87,16 @@ export const refreshService = async (refreshToken) => {
   await Session.deleteOne({ _id: session._id });
 
   const tokens = generateTokens(userId);
-  await Session.create({ userId, ...tokens });
+  const newSession = await Session.create({ userId, ...tokens });
 
-  return tokens;
+  return {
+    ...tokens,
+    sessionId: newSession._id.toString(),
+  };
 };
 
 export const logoutService = async (refreshToken) => {
   if (!refreshToken) return;
 
-  const session = await Session.findOneAndDelete({ refreshToken });
-
-  if (!session) {
-    console.warn('⚠️ No session found to logout');
-  }
+  await Session.findOneAndDelete({ refreshToken });
 };
