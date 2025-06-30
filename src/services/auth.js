@@ -47,12 +47,11 @@ export const loginService = async ({ email, password }) => {
   await Session.deleteMany({ userId: user._id });
 
   const tokens = generateTokens(user._id);
-  const session = await Session.create({ userId: user._id, ...tokens });
+  await Session.create({ userId: user._id, ...tokens });
 
   return {
     accessToken: tokens.accessToken,
     refreshToken: tokens.refreshToken,
-    sessionId: session._id,
   };
 };
 

@@ -12,6 +12,13 @@ const setupSessionCookies = (res, tokens) => {
     sameSite: 'lax',
     maxAge: 30 * 24 * 60 * 60 * 1000,
   });
+
+  res.cookie('accessToken', tokens.accessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 15 * 60 * 1000,
+  });
 };
 
 export const register = async (req, res) => {
@@ -33,7 +40,6 @@ export const login = async (req, res) => {
     message: 'Successfully logged in an user!',
     data: {
       accessToken: tokens.accessToken,
-      sessionId: tokens.sessionId,
     },
   });
 };
@@ -58,6 +64,7 @@ export const logout = async (req, res) => {
   await logoutService(refreshToken);
 
   res.clearCookie('refreshToken');
+  res.clearCookie('accessToken');
 
   res.status(204).send();
 };
