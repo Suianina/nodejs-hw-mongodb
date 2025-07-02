@@ -1,4 +1,5 @@
 import { ContactsCollection } from '../db/models/contacts.js';
+import mongoose from 'mongoose';
 
 export const getAllContacts = async (
   { page = 1, perPage = 10, sortBy = 'name', sortOrder = 'asc', filter = {} },
@@ -53,10 +54,12 @@ export const addContact = async (payload) => {
 };
 
 export const getContactById = async (contactId, userId) => {
+  if (!mongoose.Types.ObjectId.isValid(contactId)) return null;
   return await ContactsCollection.findOne({ _id: contactId, userId });
 };
 
 export const updateContact = async (contactId, contactData, userId) => {
+  if (!mongoose.Types.ObjectId.isValid(contactId)) return null;
   return await ContactsCollection.findOneAndUpdate(
     { _id: contactId, userId },
     contactData,
@@ -65,5 +68,9 @@ export const updateContact = async (contactId, contactData, userId) => {
 };
 
 export const deleteContact = async (contactId, userId) => {
-  return await ContactsCollection.findOneAndDelete({ _id: contactId, userId });
+  if (!mongoose.Types.ObjectId.isValid(contactId)) return null;
+  return await ContactsCollection.findOneAndDelete({
+    _id: contactId,
+    userId,
+  });
 };
