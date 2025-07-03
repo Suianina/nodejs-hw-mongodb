@@ -1,13 +1,21 @@
-import dotenv from 'dotenv';
+import { config } from 'dotenv';
+import { resolve } from 'path';
+import { fileURLToPath } from 'url';
 
-dotenv.config();
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
+config({ path: resolve(__dirname, '../../.env') });
 
-export function env(name, defaultValue) {
+export const env = (name, defaultValue = null) => {
   const value = process.env[name];
 
-  if (value) return value;
+  if (value !== undefined && value !== null) {
+    return value;
+  }
 
-  if (defaultValue) return defaultValue;
+  if (defaultValue !== null) {
+    return defaultValue;
+  }
 
-  throw new Error(`Missing: process.env['${name}'].`);
-}
+  console.error('Available environment variables:', Object.keys(process.env));
+  throw new Error(`Missing required environment variable: ${name}`);
+};

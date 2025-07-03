@@ -2,9 +2,12 @@
   "name": "nodejs-hw-mongodb",
   "version": "1.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=20.12.1"
+  },
   "main": "src/index.js",
   "scripts": {
-    "dev": "nodemon src/index.js",
+    "dev": "set NODE_OPTIONS=--enable-source-maps&& nodemon src/index.js",
     "start": "node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -15,7 +18,7 @@
     "connect-mongo": "^5.1.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
-    "dotenv": "^16.5.0",
+    "dotenv": "^16.6.1",
     "express": "^5.1.0",
     "express-session": "^1.18.1",
     "http-errors": "^2.0.0",
