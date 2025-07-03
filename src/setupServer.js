@@ -7,12 +7,19 @@ import router from './routers/index.js';
 import { logger } from './middlewares/logger.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandler } from './middlewares/errorHandler.js';
+import cron from 'node-cron';
+import { cleanupExpiredSessions } from './utils/cleanupSessions.js';
 
 export const setupServer = async () => {
   const app = express();
   const PORT = Number(env('PORT', '3000'));
 
-  app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+  app.use(
+    cors({
+      origin: env('FRONTEND_ORIGIN', 'http://localhost:3000'),
+      credentials: true,
+    }),
+  );
   app.use(cookieParser());
   app.use(express.json());
   app.use(logger);
@@ -26,7 +33,13 @@ export const setupServer = async () => {
   app.use(errorHandler);
 
   await initMongoDB();
+
   app.listen(PORT, () => {
     console.log(`🚀 Server is listening on port ${PORT}`);
+  });
+
+  cron.schedule('0 0 * * *', async () => {
+    console.log('⏰ Running session cleanup job...');
+    await cleanupExpiredSessions();
   });
 };

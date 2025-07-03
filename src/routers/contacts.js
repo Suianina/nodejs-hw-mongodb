@@ -8,7 +8,8 @@ import {
 } from '../validation/contacts.js';
 import ctrlWrapper from '../utils/ctrlWrapper.js';
 import { validateQueryParams } from '../middlewares/validateQueryParams.js';
-import { authenticate } from '../middlewares/authenticate.js'; // ✅
+import { authenticate } from '../middlewares/authenticate.js';
+import { upload } from '../middlewares/upload.js';
 
 const contactsRouter = Router();
 
@@ -28,15 +29,48 @@ contactsRouter.get(
 
 contactsRouter.post(
   '/',
+  upload.single('photo'),
   validateBody(createContactsSchema),
-  ctrlWrapper(contactControllers.addContactController),
+  ctrlWrapper(async (req, res, next) => {
+    const contact = await contactControllers.addContactController(
+      {
+        ...req,
+        body: {
+          ...req.body,
+          userId: req.user._id,
+          ...(req.file && { photo: req.file.path }),
+        },
+      },
+      res,
+      next,
+    );
+
+    return contact;
+  }),
 );
 
 contactsRouter.patch(
   '/:contactId',
   isValidId,
+  upload.single('photo'),
   validateBody(updateContactsSchema),
-  ctrlWrapper(contactControllers.patchContactController),
+  ctrlWrapper(async (req, res, next) => {
+    const contact = await contactControllers.patchContactController(
+      {
+        ...req,
+        params: req.params,
+        body: {
+          ...req.body,
+          ...(req.file && { photo: req.file.path }),
+        },
+        user: req.user,
+      },
+      res,
+      next,
+    );
+
+    return contact;
+  }),
 );
 
 contactsRouter.put(
