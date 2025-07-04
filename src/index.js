@@ -1,12 +1,19 @@
 import './utils/env.js';
 import { setupServer } from './setupServer.js';
+import { initMongoDB } from './db/initMongoConnection.js';
+import { createDirIfNotExists } from './utils/createDirIfNotExists.js';
+import { TEMP_UPLOAD_DIR, UPLOAD_DIR } from './constants/index.js';
 
 console.log('Environment check:', {
-  CLOUDINARY: process.env.CLOUDINARY_CLOUD_NAME ? 'loaded' : 'missing',
+  CLOUDINARY: process.env.CLOUDINARY_NAME ? 'loaded' : 'missing',
   MONGO_DB: process.env.MONGODB_DB ? 'loaded' : 'missing',
 });
 
 const bootstrap = async () => {
+  await createDirIfNotExists(TEMP_UPLOAD_DIR);
+  await createDirIfNotExists(UPLOAD_DIR);
+
+  await initMongoDB();
   await setupServer();
 };
 

@@ -10,6 +10,9 @@ import createHttpError from 'http-errors';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseFilterParams } from '../utils/parseFilterParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
+import { uploadToCloudinary } from '../utils/cloudinary.js';
+import { saveFileToUploadDir } from '../utils/saveFileToUploadDir.js';
+import { env } from '../utils/env.js';
 
 export const getContactsController = async (req, res, next) => {
   try {
@@ -79,9 +82,19 @@ export const getContactByIdController = async (req, res, next) => {
 
 export const addContactController = async (req, res, next) => {
   try {
+    let photoUrl = null;
+
+    if (req.file) {
+      photoUrl =
+        env('ENABLE_CLOUDINARY') === 'true'
+          ? await uploadToCloudinary(req.file)
+          : await saveFileToUploadDir(req.file);
+    }
+
     const contact = await addContact({
       ...req.body,
       userId: req.user._id,
+      ...(photoUrl && { photo: photoUrl }),
     });
 
     res.status(201).json({
@@ -98,9 +111,20 @@ export const patchContactController = async (req, res, next) => {
   try {
     const { contactId } = req.params;
 
+    let photoUrl;
+    if (req.file) {
+      photoUrl =
+        env('ENABLE_CLOUDINARY') === 'true'
+          ? await uploadToCloudinary(req.file)
+          : await saveFileToUploadDir(req.file);
+    }
+
     const updatedContact = await updateContact(
       contactId,
-      req.body,
+      {
+        ...req.body,
+        ...(photoUrl && { photo: photoUrl }),
+      },
       req.user._id,
     );
 

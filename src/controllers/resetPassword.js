@@ -5,9 +5,19 @@ import nodemailer from 'nodemailer';
 import { env } from '../utils/env.js';
 import { User } from '../db/models/user.js';
 import { Session } from '../db/models/session.js';
+import fs from 'fs/promises';
+import path from 'path';
+import handlebars from 'handlebars';
 
 const JWT_SECRET = env('JWT_SECRET');
 const APP_DOMAIN = env('APP_DOMAIN');
+
+const TEMPLATE_PATH = path.join(
+  process.cwd(),
+  'src',
+  'templates',
+  'reset-password-email.html',
+);
 
 const transporter = nodemailer.createTransport({
   host: env('SMTP_HOST'),
@@ -21,20 +31,21 @@ const transporter = nodemailer.createTransport({
 export const sendResetEmail = async (req, res) => {
   const { email } = req.body;
   const user = await User.findOne({ email });
-
-  if (!user) {
-    throw createHttpError(404, 'User not found!');
-  }
+  if (!user) throw createHttpError(404, 'User not found!');
 
   const token = jwt.sign({ email }, JWT_SECRET, { expiresIn: '5m' });
   const resetLink = `${APP_DOMAIN}/reset-password?token=${token}`;
+
+  const htmlSrc = await fs.readFile(TEMPLATE_PATH);
+  const template = handlebars.compile(htmlSrc.toString());
+  const html = template({ name: user.name, link: resetLink });
 
   try {
     await transporter.sendMail({
       from: env('SMTP_FROM'),
       to: email,
       subject: 'Reset your password',
-      html: `<p>Click <a href="${resetLink}">here</a> to reset your password. This link will expire in 5 minutes.</p>`,
+      html,
     });
 
     res.status(200).json({
@@ -42,7 +53,7 @@ export const sendResetEmail = async (req, res) => {
       message: 'Reset password email has been successfully sent.',
       data: {},
     });
-  } catch (error) {
+  } catch {
     throw createHttpError(
       500,
       'Failed to send the email, please try again later.',
@@ -56,8 +67,13 @@ export const resetPassword = async (req, res) => {
   let payload;
   try {
     payload = jwt.verify(token, JWT_SECRET);
-  } catch {
-    throw createHttpError(401, 'Token is expired or invalid.');
+  } catch (err) {
+    if (
+      err instanceof jwt.TokenExpiredError ||
+      err instanceof jwt.JsonWebTokenError
+    ) {
+      throw createHttpError(401, 'Token is expired or invalid');
+    }
   }
 
   const user = await User.findOne({ email: payload.email });
