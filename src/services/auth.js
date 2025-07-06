@@ -29,10 +29,17 @@ const generateTokens = (userId) => {
 };
 
 export const registerService = async ({ name, email, password }) => {
+  console.log('🔐 REGISTER INPUT:', { name, email, password });
+
   const existingUser = await User.findOne({ email });
-  if (existingUser) throw createHttpError(409, 'Email in use');
+  if (existingUser) {
+    console.warn('⚠️ Email already in use:', email);
+    throw createHttpError(409, 'Email in use');
+  }
 
   const hashedPassword = await bcrypt.hash(password, 12);
+  console.log('🔐 HASHED PASSWORD:', hashedPassword);
+
   const user = await User.create({ name, email, password: hashedPassword });
 
   return {

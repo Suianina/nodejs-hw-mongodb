@@ -67,7 +67,7 @@ export const sendResetEmail = async (req, res) => {
 
     // Генерація токена на 5 хв
     const token = jwt.sign({ email }, JWT_SECRET, { expiresIn: '5m' });
-    const resetLink = `${APP_DOMAIN}/auth/reset-password?token=${token}`;
+    const resetLink = `${APP_DOMAIN}/reset-password?token=${token}`;
 
     console.log('🔗 Password reset link:', resetLink);
 

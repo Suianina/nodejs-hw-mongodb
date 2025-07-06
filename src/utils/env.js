@@ -8,7 +8,7 @@ config({ path: resolve(__dirname, '../../.env') });
 export const env = (name, defaultValue = null) => {
   const value = process.env[name];
 
-  if (value !== undefined && value !== null) {
+  if (value !== undefined && value !== null && value !== '') {
     return value;
   }
 
@@ -16,6 +16,8 @@ export const env = (name, defaultValue = null) => {
     return defaultValue;
   }
 
-  console.error('Available environment variables:', Object.keys(process.env));
-  throw new Error(`Missing required environment variable: ${name}`);
+  console.error(`❌ Missing required environment variable: ${name}`);
+  throw new Error(
+    `Missing required environment variable: ${name}. Check your .env file.`,
+  );
 };

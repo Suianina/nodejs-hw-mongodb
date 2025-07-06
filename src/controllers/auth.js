@@ -10,16 +10,14 @@ import path from 'path';
 import handlebars from 'handlebars';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { registerService } from '../services/auth.js';
 
-// Отримуємо __dirname для ES модулів
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Константи
 const JWT_SECRET = env('JWT_SECRET');
 const APP_DOMAIN = env('APP_DOMAIN');
 
-// Шлях до шаблону листа
 const TEMPLATE_PATH = path.join(
   __dirname,
   '..',
@@ -27,7 +25,6 @@ const TEMPLATE_PATH = path.join(
   'reset-password-email.html',
 );
 
-// Налаштування транспортера
 const transporter = nodemailer.createTransport({
   host: env('SMTP_HOST'),
   port: Number(env('SMTP_PORT')),
@@ -41,19 +38,32 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Перевірка SMTP з'єднання
 transporter.verify((error) => {
   if (error) {
-    console.error('SMTP Connection Error:', error);
+    console.error('❌ SMTP Connection Error:', error);
   } else {
     console.log('✅ SMTP Connection Verified');
   }
 });
 
-// 📧 Надсилання листа для скидання пароля
+// ✅ Контролер реєстрації
+export const register = async (req, res, next) => {
+  try {
+    const user = await registerService(req.body);
+    res.status(201).json({
+      status: 201,
+      message: 'User registered successfully',
+      data: user,
+    });
+  } catch (error) {
+    console.error('❌ REGISTER ERROR:', error);
+    next(error);
+  }
+};
+
+// 📧 Надсилання листа зі скиданням пароля
 export const sendResetEmail = async (req, res) => {
   const { email } = req.body;
-
   try {
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       throw createHttpError(400, 'Invalid email format');
@@ -65,31 +75,18 @@ export const sendResetEmail = async (req, res) => {
     }
 
     const token = jwt.sign({ email }, JWT_SECRET, { expiresIn: '5m' });
-    const resetLink = `${APP_DOMAIN}/auth/reset-password?token=${token}`; // ✅ Додано /auth
+    const resetLink = `${APP_DOMAIN}/auth/reset-password?token=${token}`;
 
-    console.log('🛠 TEMPLATE_PATH:', TEMPLATE_PATH); // перевіряє, який файл читається
-
-    const htmlSrc = await fs.readFile(TEMPLATE_PATH); // читає HTML файл
-    const template = handlebars.compile(htmlSrc.toString());
-
-    const html = template({
-      name: user.name || 'User',
-      resetLink,
-    });
-
-    console.log('📤 FINAL HTML being sent:\n', html); // ← це критично
-    console.log('💌 FINAL HTML to be sent:\n', html); // ← ДОДАЙ ЦЕ
-
-    console.log('📨 Email content preview:\n', html);
-    console.log('🔗 Reset Link:', resetLink);
-    console.log('📤 HTML being sent:\n', html); // ← має обов'язково бути!
+    const htmlSrc = await fs.readFile(TEMPLATE_PATH, 'utf-8');
+    const template = handlebars.compile(htmlSrc);
+    const html = template({ name: user.name || 'User', resetLink });
 
     await transporter.sendMail({
       from: env('SMTP_FROM'),
       to: email,
       subject: 'Password Reset Request',
       html,
-      text: `To reset your password, please click the following link: ${resetLink}`,
+      text: `To reset your password, click here: ${resetLink}`,
     });
 
     res.status(200).json({
@@ -99,9 +96,7 @@ export const sendResetEmail = async (req, res) => {
     });
   } catch (error) {
     console.error('❌ Error in sendResetEmail:', error);
-
     if (error.status === 404) throw error;
-
     throw createHttpError(
       500,
       'Failed to send the email, please try again later.',
@@ -109,10 +104,9 @@ export const sendResetEmail = async (req, res) => {
   }
 };
 
-// 🔒 Обробка скидання пароля
+// 🔐 Обробка зміни пароля
 export const resetPassword = async (req, res) => {
   const { token, password } = req.body;
-
   try {
     if (!password || password.length < 8) {
       throw createHttpError(400, 'Password must be at least 8 characters');
@@ -128,7 +122,6 @@ export const resetPassword = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 12);
     user.password = hashedPassword;
     await user.save();
-
     await Session.deleteMany({ userId: user._id });
 
     res.status(200).json({
@@ -138,7 +131,6 @@ export const resetPassword = async (req, res) => {
     });
   } catch (error) {
     console.error('❌ Error in resetPassword:', error);
-
     if (
       error instanceof jwt.TokenExpiredError ||
       error instanceof jwt.JsonWebTokenError
@@ -149,7 +141,6 @@ export const resetPassword = async (req, res) => {
         data: null,
       });
     }
-
     throw createHttpError(
       500,
       'Failed to reset password, please try again later.',
