@@ -1,4 +1,7 @@
 import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { env } from './utils/env.js';
@@ -10,9 +13,17 @@ import { errorHandler } from './middlewares/errorHandler.js';
 import cron from 'node-cron';
 import { cleanupExpiredSessions } from './utils/cleanupSessions.js';
 
+// 🔽 Додаткові змінні для ES-модулів
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 export const setupServer = async () => {
   const app = express();
   const PORT = Number(env('PORT', '3000'));
+
+  // ✅ Підключаємо EJS
+  app.set('view engine', 'ejs');
+  app.set('views', path.join(__dirname, 'views'));
 
   app.use(
     cors({

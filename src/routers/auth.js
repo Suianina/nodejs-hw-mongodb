@@ -8,6 +8,13 @@ import ctrlWrapper from '../utils/ctrlWrapper.js';
 
 const authRouter = Router();
 
+// ✅ Додаємо GET /reset-password ДО post /reset-pwd
+authRouter.get('/reset-password', (req, res) => {
+  const { token } = req.query;
+  if (!token) return res.status(400).send('Invalid reset link');
+  res.render('reset-password', { token });
+});
+
 authRouter.post(
   '/register',
   validateBody(registerSchema),

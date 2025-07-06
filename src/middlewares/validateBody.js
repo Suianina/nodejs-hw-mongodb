@@ -7,20 +7,15 @@ export const validateBody = (schema) => (req, res, next) => {
   });
 
   if (error) {
-    const errors = error.details.map((err) => ({
+    const details = error.details.map((err) => ({
       message: err.message,
-      path: [err.path[0]],
+      path: err.path,
       type: err.type,
-      context: {
-        label: err.context.label,
-        value: err.context.value,
-        key: err.context.key,
-      },
     }));
 
     return next(
-      createHttpError(400, 'BadRequestError', {
-        details: errors,
+      createHttpError(400, 'Invalid request body', {
+        details,
       }),
     );
   }
