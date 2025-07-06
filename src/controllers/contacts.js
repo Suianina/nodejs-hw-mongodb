@@ -70,7 +70,7 @@ export const getContactByIdController = async (req, res, next) => {
       throw createHttpError(404, 'Contact not found');
     }
 
-    res.json({
+    res.status(200).json({
       status: 200,
       message: `Successfully retrieved a contact with ID ${contactId}!`,
       data: contact,
@@ -91,11 +91,16 @@ export const addContactController = async (req, res, next) => {
           : await saveFileToUploadDir(req.file);
     }
 
-    const contact = await addContact({
+    const contactData = {
       ...req.body,
       userId: req.user._id,
-      ...(photoUrl && { photo: photoUrl }),
-    });
+    };
+
+    if (photoUrl) {
+      contactData.photo = photoUrl;
+    }
+
+    const contact = await addContact(contactData);
 
     res.status(201).json({
       status: 201,
@@ -111,7 +116,7 @@ export const patchContactController = async (req, res, next) => {
   try {
     const { contactId } = req.params;
 
-    let photoUrl;
+    let photoUrl = null;
     if (req.file) {
       photoUrl =
         env('ENABLE_CLOUDINARY') === 'true'
@@ -119,12 +124,17 @@ export const patchContactController = async (req, res, next) => {
           : await saveFileToUploadDir(req.file);
     }
 
+    const updateData = {
+      ...req.body,
+    };
+
+    if (photoUrl) {
+      updateData.photo = photoUrl;
+    }
+
     const updatedContact = await updateContact(
       contactId,
-      {
-        ...req.body,
-        ...(photoUrl && { photo: photoUrl }),
-      },
+      updateData,
       req.user._id,
     );
 
@@ -132,7 +142,7 @@ export const patchContactController = async (req, res, next) => {
       throw createHttpError(404, 'Contact not found or not yours');
     }
 
-    res.json({
+    res.status(200).json({
       status: 200,
       message: 'Successfully updated a contact!',
       data: updatedContact,
@@ -156,7 +166,7 @@ export const putContactController = async (req, res, next) => {
       throw createHttpError(404, 'Contact not found or not yours');
     }
 
-    res.json({
+    res.status(200).json({
       status: 200,
       message: 'Successfully replaced a contact!',
       data: updatedContact,

@@ -12,34 +12,39 @@ const FIFTEEN_MINUTES = 15 * 60 * 1000;
 const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
 
 const generateTokens = (userId) => {
-  const accessToken = jwt.sign({ id: userId }, ACCESS_TOKEN_SECRET, {
-    expiresIn: '15m',
-  });
+  if (!ACCESS_TOKEN_SECRET || !REFRESH_TOKEN_SECRET) {
+    throw createHttpError(
+      500,
+      'Missing ACCESS_TOKEN_SECRET or REFRESH_TOKEN_SECRET in environment',
+    );
+  }
 
-  const refreshToken = jwt.sign({ id: userId }, REFRESH_TOKEN_SECRET, {
-    expiresIn: '30d',
-  });
+  try {
+    const accessToken = jwt.sign({ id: userId }, ACCESS_TOKEN_SECRET, {
+      expiresIn: '15m',
+    });
 
-  return {
-    accessToken,
-    refreshToken,
-    accessTokenValidUntil: new Date(Date.now() + FIFTEEN_MINUTES),
-    refreshTokenValidUntil: new Date(Date.now() + THIRTY_DAYS),
-  };
+    const refreshToken = jwt.sign({ id: userId }, REFRESH_TOKEN_SECRET, {
+      expiresIn: '30d',
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+      accessTokenValidUntil: new Date(Date.now() + FIFTEEN_MINUTES),
+      refreshTokenValidUntil: new Date(Date.now() + THIRTY_DAYS),
+    };
+  } catch (error) {
+    console.error('❌ Token generation failed:', error);
+    throw createHttpError(500, 'Token generation failed');
+  }
 };
 
 export const registerService = async ({ name, email, password }) => {
-  console.log('🔐 REGISTER INPUT:', { name, email, password });
-
   const existingUser = await User.findOne({ email });
-  if (existingUser) {
-    console.warn('⚠️ Email already in use:', email);
-    throw createHttpError(409, 'Email in use');
-  }
+  if (existingUser) throw createHttpError(409, 'Email in use');
 
   const hashedPassword = await bcrypt.hash(password, 12);
-  console.log('🔐 HASHED PASSWORD:', hashedPassword);
-
   const user = await User.create({ name, email, password: hashedPassword });
 
   return {
@@ -52,24 +57,39 @@ export const registerService = async ({ name, email, password }) => {
 };
 
 export const loginService = async ({ email, password }) => {
-  const user = await User.findOne({ email });
-  if (!user) throw createHttpError(401, 'Invalid email or password');
+  console.log('📥 Email:', email);
+  console.log('📥 Password (length):', password?.length);
 
-  const passwordMatch = await bcrypt.compare(password, user.password);
-  if (!passwordMatch) throw createHttpError(401, 'Invalid email or password');
+  const user = await User.findOne({ email }).select('+password');
+  console.log('👤 User found:', !!user);
+
+  if (!user || !user.password) {
+    console.log('❌ Invalid email or missing password in DB');
+    throw createHttpError(401, 'Invalid email or password');
+  }
+
+  const isMatch = await bcrypt.compare(password, user.password);
+  console.log('🔐 Password match:', isMatch);
+
+  if (!isMatch) {
+    console.log('❌ Password does not match');
+    throw createHttpError(401, 'Invalid email or password');
+  }
 
   await Session.deleteMany({ userId: user._id });
+  console.log('🧹 Old sessions deleted for user:', user._id.toString());
 
   const tokens = generateTokens(user._id);
-  const session = await Session.create({
-    userId: user._id,
-    ...tokens,
-  });
+  console.log(
+    '🎟️ Tokens generated:',
+    !!tokens.accessToken,
+    !!tokens.refreshToken,
+  );
 
-  return {
-    ...tokens,
-    sessionId: session._id.toString(),
-  };
+  const session = await Session.create({ userId: user._id, ...tokens });
+  console.log('💾 Session created with ID:', session._id.toString());
+
+  return { ...tokens, sessionId: session._id.toString() };
 };
 
 export const refreshService = async (refreshToken) => {
@@ -82,28 +102,20 @@ export const refreshService = async (refreshToken) => {
     throw createHttpError(401, 'Invalid or expired refresh token');
   }
 
-  const userId = payload.id;
-
-  const session = await Session.findOne({ userId, refreshToken });
-  if (!session) throw createHttpError(401, 'Invalid session');
-
-  if (session.refreshTokenValidUntil < new Date()) {
-    throw createHttpError(401, 'Refresh token expired');
+  const session = await Session.findOne({ userId: payload.id, refreshToken });
+  if (!session || session.refreshTokenValidUntil < new Date()) {
+    throw createHttpError(401, 'Session expired');
   }
 
   await Session.deleteOne({ _id: session._id });
 
-  const tokens = generateTokens(userId);
-  const newSession = await Session.create({ userId, ...tokens });
+  const tokens = generateTokens(payload.id);
+  const newSession = await Session.create({ userId: payload.id, ...tokens });
 
-  return {
-    ...tokens,
-    sessionId: newSession._id.toString(),
-  };
+  return { ...tokens, sessionId: newSession._id.toString() };
 };
 
 export const logoutService = async (refreshToken) => {
   if (!refreshToken) return;
-
   await Session.findOneAndDelete({ refreshToken });
 };

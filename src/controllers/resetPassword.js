@@ -11,7 +11,6 @@ import handlebars from 'handlebars';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
-// Отримуємо __dirname для ES модулів
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -19,7 +18,6 @@ const __dirname = dirname(__filename);
 const JWT_SECRET = env('JWT_SECRET');
 const APP_DOMAIN = env('APP_DOMAIN');
 
-// Шлях до шаблону листа
 const TEMPLATE_PATH = path.join(
   __dirname,
   '..',
@@ -27,11 +25,10 @@ const TEMPLATE_PATH = path.join(
   'reset-password-email.html',
 );
 
-// Налаштування транспортера (через Gmail або Brevo)
 const transporter = nodemailer.createTransport({
   host: env('SMTP_HOST'),
   port: Number(env('SMTP_PORT')),
-  secure: Number(env('SMTP_PORT')) === 465, // 465 = secure
+  secure: Number(env('SMTP_PORT')) === 465,
   auth: {
     user: env('SMTP_USER'),
     pass: env('SMTP_PASSWORD'),
@@ -41,7 +38,6 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Перевірка підключення SMTP
 transporter.verify((error) => {
   if (error) {
     console.error('SMTP Connection Error:', error);
@@ -50,12 +46,10 @@ transporter.verify((error) => {
   }
 });
 
-// Відправка листа зі скиданням пароля
 export const sendResetEmail = async (req, res) => {
   const { email } = req.body;
 
   try {
-    // Валідація email
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       throw createHttpError(400, 'Invalid email format');
     }
@@ -65,21 +59,18 @@ export const sendResetEmail = async (req, res) => {
       throw createHttpError(404, 'User not found!');
     }
 
-    // Генерація токена на 5 хв
     const token = jwt.sign({ email }, JWT_SECRET, { expiresIn: '5m' });
     const resetLink = `${APP_DOMAIN}/reset-password?token=${token}`;
 
     console.log('🔗 Password reset link:', resetLink);
 
-    // Завантаження і компіляція шаблону
     const htmlSrc = await fs.readFile(TEMPLATE_PATH);
     const template = handlebars.compile(htmlSrc.toString());
     const html = template({
       name: user.name || 'User',
-      resetLink, // 🟢 ІМʼЯ ЗМІННОЇ МАЄ СПІВПАДАТИ З {{resetLink}} у HTML
+      resetLink,
     });
 
-    // Надсилання листа
     await transporter.sendMail({
       from: env('SMTP_FROM'),
       to: email,
@@ -105,17 +96,14 @@ export const sendResetEmail = async (req, res) => {
   }
 };
 
-// Обробка зміни пароля за токеном
 export const resetPassword = async (req, res) => {
   const { token, password } = req.body;
 
   try {
-    // Валідація пароля
     if (!password || password.length < 8) {
       throw createHttpError(400, 'Password must be at least 8 characters');
     }
 
-    // Валідація токена
     const payload = jwt.verify(token, JWT_SECRET);
     const user = await User.findOne({ email: payload.email });
 
@@ -123,12 +111,10 @@ export const resetPassword = async (req, res) => {
       throw createHttpError(404, 'User not found!');
     }
 
-    // Хешування нового пароля
     const hashedPassword = await bcrypt.hash(password, 12);
     user.password = hashedPassword;
     await user.save();
 
-    // Видалення всіх активних сесій
     await Session.deleteMany({ userId: user._id });
 
     res.status(200).json({
