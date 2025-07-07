@@ -3,8 +3,7 @@ const parseSortBy = (value) => {
     return '_id';
   }
 
-  const keys = ['_id', 'name', 'createdAt', 'isFavourite'];
-
+  const keys = ['_id', 'name', 'createdAt'];
   return keys.includes(value) ? value : '_id';
 };
 
@@ -13,9 +12,7 @@ const parseSortOrder = (value) => {
     return 'asc';
   }
 
-  return ['asc', 'desc'].includes(value.toLowerCase())
-    ? value.toLowerCase()
-    : 'asc';
+  return ['asc', 'desc'].includes(value) ? value : 'asc';
 };
 
 export const parseSortParams = (query) => {

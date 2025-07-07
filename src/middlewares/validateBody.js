@@ -1,22 +1,11 @@
 import createHttpError from 'http-errors';
 
 export const validateBody = (schema) => (req, res, next) => {
-  const { error } = schema.validate(req.body, {
-    abortEarly: false,
-    allowUnknown: false,
-  });
+  const { error } = schema.validate(req.body, { abortEarly: false });
 
   if (error) {
-    const details = error.details.map((err) => ({
-      message: err.message,
-      path: err.path,
-      type: err.type,
-    }));
-
     return next(
-      createHttpError(400, 'Invalid request body', {
-        details,
-      }),
+      createHttpError(400, error.details.map((err) => err.message).join(', ')),
     );
   }
 

@@ -1,91 +1,100 @@
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
-import createHttpError from 'http-errors';
-import nodemailer from 'nodemailer';
-import { env } from '../utils/env.js';
-import { User } from '../db/models/user.js';
-import { Session } from '../db/models/session.js';
-import fs from 'fs/promises';
-import path from 'path';
-import handlebars from 'handlebars';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import {
+  registerUser,
+  loginUser,
+  refreshUserSession,
+  logoutUser,
+  requestResetToken,
+  resetPassword,
+} from '../services/auth.js';
+import { SEVEN_DAY } from '../constants/index.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const sessionFunc = (res, session) => {
+  res.cookie('refreshToken', session.refreshToken, {
+    httpOnly: true,
+    expires: new Date(Date.now() + SEVEN_DAY),
+  });
 
-const JWT_SECRET = env('JWT_SECRET');
-const APP_DOMAIN = env('APP_DOMAIN');
-const TEMPLATE_PATH = path.join(
-  __dirname,
-  '..',
-  'templates',
-  'reset-password-email.html',
-);
-
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: env('SMTP_USER'),
-    pass: env('SMTP_PASSWORD'),
-  },
-});
-
-export const sendResetEmail = async (req, res, next) => {
-  const { email } = req.body;
-  try {
-    const user = await User.findOne({ email });
-    if (!user) throw createHttpError(404, 'User not found!');
-
-    const token = jwt.sign({ email }, JWT_SECRET, { expiresIn: '5m' });
-    const resetLink = `${APP_DOMAIN}/reset-password?token=${token}`;
-
-    const html = await fs.readFile(TEMPLATE_PATH, 'utf-8');
-    const template = handlebars.compile(html);
-
-    await transporter.sendMail({
-      from: env('SMTP_FROM'),
-      to: email,
-      subject: 'Password Reset Request',
-      html: template({ name: user.name || 'User', resetLink }),
-      text: `Reset link: ${resetLink}`,
-    });
-
-    res.status(200).json({
-      status: 200,
-      message: 'Reset email sent successfully',
-      data: {},
-    });
-  } catch (error) {
-    next(
-      createHttpError(500, 'Failed to send the email, please try again later.'),
-    );
-  }
+  res.cookie('sessionId', session._id.toString(), {
+    httpOnly: true,
+    expires: new Date(Date.now() + SEVEN_DAY),
+  });
 };
 
-export const resetPassword = async (req, res, next) => {
-  const { token, password } = req.body;
+export const registerUserController = async (req, res) => {
+  const user = await registerUser(req.body);
+
+  res.status(201).json({
+    status: 201,
+    message: 'Successfully registered user!',
+    data: user,
+  });
+};
+
+export const loginUserController = async (req, res) => {
+  const session = await loginUser(req.body);
+
+  sessionFunc(res, session);
+
+  res.json({
+    status: 200,
+    message: 'Successfully login user',
+    data: {
+      accessToken: session.accessToken,
+    },
+  });
+};
+
+export const refreshSessionControllers = async (req, res) => {
+  const { sessionId, refreshToken } = req.cookies;
+  const session = await refreshUserSession({ sessionId, refreshToken });
+
+  sessionFunc(res, session);
+
+  res.json({
+    status: 200,
+    message: 'Successfully refreshed session',
+    data: {
+      accessToken: session.accessToken,
+    },
+  });
+};
+
+export const logoutControllers = async (req, res) => {
+  const { sessionId } = req.cookies;
+
+  if (sessionId) {
+    await logoutUser(sessionId);
+  }
+
+  res.clearCookie('sessionId');
+  res.clearCookie('refreshToken');
+  res.status(204).send();
+};
+
+export const requestResetEmailController = async (req, res) => {
+  await requestResetToken(req.body.email);
+
+  res.json({
+    status: 200,
+    message: 'Reset password email has been successfully sent.',
+    data: {},
+  });
+};
+
+export const resetPasswordController = async (req, res) => {
   try {
-    const { email } = jwt.verify(token, JWT_SECRET);
-    const user = await User.findOne({ email });
-    if (!user) throw createHttpError(404, 'User not found!');
-
-    user.password = await bcrypt.hash(password, 12);
-    await user.save();
-    await Session.deleteMany({ userId: user._id });
-
-    res.status(200).json({
+    await resetPassword(req.body);
+    res.json({
       status: 200,
-      message: 'Password reset successfully',
+      message: 'Password has been successfully reset.',
       data: {},
     });
   } catch (error) {
-    if (
-      error.name === 'TokenExpiredError' ||
-      error.name === 'JsonWebTokenError'
-    ) {
-      return next(createHttpError(401, 'Token is expired or invalid.'));
-    }
-    next(error);
+    console.error('Error in resetPasswordController:', error);
+    res.status(500).json({
+      status: 500,
+      message: 'Internal Server Error',
+      error: error.message,
+    });
   }
 };

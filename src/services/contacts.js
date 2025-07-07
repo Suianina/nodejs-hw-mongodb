@@ -1,76 +1,72 @@
 import { ContactsCollection } from '../db/models/contacts.js';
-import mongoose from 'mongoose';
 
-export const getAllContacts = async (
-  { page = 1, perPage = 10, sortBy = 'name', sortOrder = 'asc', filter = {} },
+export const getAllContacts = async ({
+  page,
+  perPage,
+  sortBy,
+  sortOrder,
+  filter,
   userId,
-) => {
-  const skip = (page - 1) * perPage;
+}) => {
+  const skip = page > 0 ? (page - 1) * perPage : 0;
 
-  const filterQuery = { userId };
+  const contactQuery = ContactsCollection.find();
 
-  if (typeof filter.contactType !== 'undefined') {
-    filterQuery.contactType = filter.contactType;
+  if (typeof filter.type !== 'undefined') {
+    contactQuery.where('contactType').equals(filter.type);
   }
 
-  if (typeof filter.isFavourite !== 'undefined') {
-    filterQuery.isFavourite = filter.isFavourite;
+  if (typeof filter.isFavorite !== 'undefined') {
+    contactQuery.where('isFavourite').equals(filter.isFavorite);
+  }
+  if (filter.userId || userId) {
+    contactQuery.where('userId').equals(userId);
   }
 
-  if (filter.email === null) {
-    filterQuery.email = { $eq: null, $exists: true };
-  } else if (typeof filter.email !== 'undefined') {
-    filterQuery.email = filter.email;
-  }
+  const [total, contacts] = await Promise.all([
+    ContactsCollection.countDocuments(contactQuery),
+    contactQuery
+      .sort({ [sortBy]: sortOrder })
+      .skip(skip)
+      .limit(perPage),
+  ]);
 
-  if (typeof filter.phoneNumber !== 'undefined') {
-    filterQuery.phoneNumber = filter.phoneNumber;
-  }
-
-  const totalItems = await ContactsCollection.countDocuments(filterQuery);
-
-  const contacts = await ContactsCollection.find(filterQuery)
-    .sort({ [sortBy]: sortOrder === 'desc' ? -1 : 1 })
-    .skip(skip)
-    .limit(perPage);
-
-  const totalPages = Math.ceil(totalItems / perPage);
-  const hasPreviousPage = page > 1;
-  const hasNextPage = page < totalPages;
+  const totalPages = Math.ceil(total / perPage);
 
   return {
     data: contacts,
-    page,
-    perPage,
-    totalItems,
+    page: page,
+    perPage: perPage,
+    totalItems: total,
     totalPages,
-    hasPreviousPage,
-    hasNextPage,
+    hasPreviousPage: page > 1,
+    hasNextPage: totalPages - page > 0,
   };
 };
 
-export const addContact = async (payload) => {
-  return await ContactsCollection.create(payload);
-};
-
 export const getContactById = async (contactId, userId) => {
-  if (!mongoose.Types.ObjectId.isValid(contactId)) return null;
-  return await ContactsCollection.findOne({ _id: contactId, userId });
+  const contact = await ContactsCollection.findOne({ _id: contactId, userId });
+  return contact;
 };
 
-export const updateContact = async (contactId, contactData, userId) => {
-  if (!mongoose.Types.ObjectId.isValid(contactId)) return null;
-  return await ContactsCollection.findOneAndUpdate(
+export const addContact = async (payload) => {
+  const contact = await ContactsCollection.create(payload);
+  return contact;
+};
+
+export const updateContact = async (contactId, contact, userId) => {
+  return ContactsCollection.findOneAndUpdate(
     { _id: contactId, userId },
-    contactData,
+    contact,
     { new: true },
   );
 };
 
 export const deleteContact = async (contactId, userId) => {
-  if (!mongoose.Types.ObjectId.isValid(contactId)) return null;
-  return await ContactsCollection.findOneAndDelete({
+  const contact = await ContactsCollection.findOneAndDelete({
     _id: contactId,
     userId,
   });
+
+  return contact;
 };

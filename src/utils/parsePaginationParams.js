@@ -1,33 +1,18 @@
-import createHttpError from 'http-errors';
+const parseNumber = (number, defaultValue) => {
+  if (typeof number !== 'string') return defaultValue;
+
+  const parsedNumber = parseInt(number, 10);
+  return Number.isNaN(parsedNumber) ? defaultValue : parsedNumber;
+};
 
 export const parsePaginationParams = (query) => {
-  const errors = [];
+  const { page, perPage } = query;
 
-  const parseNumber = (value, name, defaultValue) => {
-    if (value === undefined) return defaultValue;
+  const parsedPage = parseNumber(page, 1);
+  const parsedPerPage = parseNumber(perPage, 10);
 
-    const num = parseInt(value, 10);
-    if (isNaN(num) || num <= 0) {
-      errors.push({
-        message: `${name} must be a positive number`,
-        path: [name],
-        type: 'invalid.query.param',
-      });
-      return defaultValue;
-    }
-
-    return num;
+  return {
+    page: parsedPage,
+    perPage: parsedPerPage,
   };
-
-  const page = parseNumber(query.page, 'page', 1);
-  const perPage = parseNumber(query.perPage, 'perPage', 10);
-
-  if (errors.length > 0) {
-    throw createHttpError(400, {
-      message: 'Invalid pagination query parameters',
-      errors,
-    });
-  }
-
-  return { page, perPage };
 };

@@ -5,6 +5,3 @@
 .vscode
 .DS_Store
 .idea
-
-/temp/**
-/uploads/**
