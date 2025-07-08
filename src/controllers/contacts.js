@@ -57,16 +57,28 @@ export const getContactIdController = async (req, res, next) => {
 
 export const addContactController = async (req, res, next) => {
   try {
+    console.log('addContactController: req.body:', req.body);
+    console.log('addContactController: req.file:', req.file);
     const { _id: userId } = req.user;
     let photoUrl = null;
     if (req.file) {
-      photoUrl = await uploadToCloudinary(req.file);
+      try {
+        photoUrl = await uploadToCloudinary(req.file);
+        console.log('addContactController: photoUrl after upload:', photoUrl);
+      } catch (uploadErr) {
+        console.error(
+          'addContactController: Error uploading to Cloudinary:',
+          uploadErr,
+        );
+        throw uploadErr;
+      }
     }
     const data = {
       ...req.body,
       userId,
       photo: photoUrl,
     };
+    console.log('addContactController: data to addContact:', data);
     const contact = await addContact(data);
     res.status(201).json({
       status: 201,
@@ -74,6 +86,7 @@ export const addContactController = async (req, res, next) => {
       data: contact,
     });
   } catch (error) {
+    console.error('addContactController: Error:', error);
     next(error);
   }
 };

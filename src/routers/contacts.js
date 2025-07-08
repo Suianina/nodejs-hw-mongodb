@@ -24,7 +24,14 @@ contactsRouter.get(
 
 contactsRouter.post(
   '/',
-  upload.single('photo'),
+  (req, res, next) => {
+    // If Content-Type is multipart/form-data, use multer
+    if (req.is('multipart/form-data')) {
+      return upload.single('photo')(req, res, next);
+    }
+    // Otherwise, proceed without multer
+    next();
+  },
   validateBody(createContactsSchema),
   ctrlWrapper(contactControllers.addContactController),
 );
