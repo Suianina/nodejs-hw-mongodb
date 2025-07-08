@@ -91,10 +91,18 @@ export const resetPasswordController = async (req, res) => {
     });
   } catch (error) {
     console.error('Error in resetPasswordController:', error);
-    res.status(500).json({
-      status: 500,
-      message: 'Internal Server Error',
-      error: error.message,
-    });
+    if (error.status && error.message) {
+      res.status(error.status).json({
+        status: error.status,
+        message: error.message,
+        data: null,
+      });
+    } else {
+      res.status(500).json({
+        status: 500,
+        message: 'Internal Server Error',
+        data: null,
+      });
+    }
   }
 };
