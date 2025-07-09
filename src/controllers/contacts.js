@@ -107,9 +107,17 @@ export const patchContactController = async (req, res, next) => {
       },
       userId,
     );
+    if (!updatedContact) {
+      return res.status(404).json({
+        status: 404,
+        message: 'Contact not found',
+        data: null,
+      });
+    }
+    // Always return the updated contact in the response
     res.status(200).json({
       status: 200,
-      message: 'Contact updated successfully',
+      message: 'Successfully patched a contact!',
       data: updatedContact,
     });
   } catch (error) {

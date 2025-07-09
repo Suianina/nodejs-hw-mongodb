@@ -3,7 +3,6 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import createHttpError from 'http-errors';
 
 import { env } from './utils/env.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
@@ -33,18 +32,6 @@ export const setupServer = () => {
     res.json({
       message: 'Contacts API is running',
     });
-  });
-
-  app.get('/reset-password', (req, res, next) => {
-    try {
-      const { token } = req.query;
-      if (!token) {
-        throw createHttpError(400, 'Token is required');
-      }
-      res.render('reset-password', { token });
-    } catch (error) {
-      next(error);
-    }
   });
 
   app.use('/', router);

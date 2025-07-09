@@ -3,6 +3,14 @@ import { findSession, findUser } from '../services/auth.js';
 
 export const authenticate = async (req, res, next) => {
   try {
+    console.log('authenticate: req.cookies:', req.cookies);
+    const { sessionId, refreshToken } = req.cookies;
+    console.log(
+      'authenticate: sessionId:',
+      sessionId,
+      'refreshToken:',
+      refreshToken,
+    );
     const authHeader = req.get('Authorization');
     if (!authHeader) {
       return next(createHttpError(401, 'Authorization header missing'));
@@ -32,6 +40,7 @@ export const authenticate = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
+    console.error('authenticate: error:', error);
     next(error);
   }
 };

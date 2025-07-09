@@ -31,10 +31,11 @@ export const registerUserController = async (req, res) => {
 };
 
 export const loginUserController = async (req, res) => {
+  console.log('loginUserController: req.body:', req.body);
+  console.log('loginUserController: req.cookies:', req.cookies);
   const session = await loginUser(req.body);
-
+  console.log('loginUserController: session:', session);
   sessionFunc(res, session);
-
   res.json({
     status: 200,
     message: 'Successfully login user',
@@ -83,10 +84,14 @@ export const requestResetEmailController = async (req, res) => {
 
 export const resetPasswordController = async (req, res) => {
   try {
+    console.log('resetPasswordController: req.body:', req.body);
     await resetPassword(req.body);
+    res.clearCookie('sessionId');
+    res.clearCookie('refreshToken');
     res.json({
       status: 200,
-      message: 'Password has been successfully reset.',
+      message:
+        'Password has been successfully reset. Please log in again with your new password.',
       data: {},
     });
   } catch (error) {
