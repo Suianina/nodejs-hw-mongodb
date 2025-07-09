@@ -9,7 +9,6 @@ const bootstrap = async () => {
   try {
     console.log('Starting application...');
 
-    // Check environment variables
     const requiredEnvVars = [
       'MONGODB_USER',
       'MONGODB_PASSWORD',

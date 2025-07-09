@@ -175,7 +175,6 @@ export const resetPassword = async ({ token, password }) => {
     { password: encryptedPassword },
   );
 
-  // Ensure userId is ObjectId for session deletion
   await SessionsCollection.deleteMany({ userId: user._id });
 };
 
