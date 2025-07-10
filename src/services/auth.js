@@ -7,6 +7,10 @@ import handlebars from 'handlebars';
 import path from 'node:path';
 
 import { UsersCollection } from '../db/models/user.js';
+import { SessionsCollection } from '../db/models/session.js';
+import { sendEmail } from '../utils/sendEmail.js';
+import { getAuthInfo } from './googleAuth.js';
+
 import {
   FIFTEEN_MINUTES,
   SEVEN_DAY,
@@ -15,8 +19,6 @@ import {
   APP_DOMAIN,
   TEMPLATES_DIR,
 } from '../constants/index.js';
-import { SessionsCollection } from '../db/models/session.js';
-import { sendEmail } from '../utils/sendEmail.js';
 
 const createSession = () => {
   const accessToken = randomBytes(30).toString('base64');
@@ -68,9 +70,11 @@ export const refreshUserSession = async ({ sessionId, refreshToken }) => {
     _id: sessionId,
     refreshToken,
   });
+
   if (!session) {
     throw createHttpError(401, 'Session not found');
   }
+
   if (new Date() > new Date(session.refreshTokenValidUntil)) {
     await SessionsCollection.deleteOne({ _id: sessionId });
     throw createHttpError(401, 'Session token expired');
@@ -178,6 +182,32 @@ export const resetPassword = async ({ token, password }) => {
   await SessionsCollection.deleteMany({ userId: user._id });
 };
 
-export const findSession = (filter) => SessionsCollection.findOne(filter);
+export const authorizeWithGoogleOauth = async (code) => {
+  const googleUser = await getAuthInfo(code);
 
+  if (!googleUser?.email) {
+    throw createHttpError(401, 'Google user has no email');
+  }
+
+  let user = await UsersCollection.findOne({ email: googleUser.email });
+
+  if (!user) {
+    user = await UsersCollection.create({
+      name: googleUser.name,
+      email: googleUser.email,
+      password: 'google_oauth_user',
+    });
+  }
+
+  await SessionsCollection.deleteMany({ userId: user._id });
+
+  const newSession = createSession();
+
+  return await SessionsCollection.create({
+    userId: user._id,
+    ...newSession,
+  });
+};
+
+export const findSession = (filter) => SessionsCollection.findOne(filter);
 export const findUser = (filter) => UsersCollection.findOne(filter);
