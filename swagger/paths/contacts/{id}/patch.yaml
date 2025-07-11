@@ -21,11 +21,11 @@ requestBody:
           name:
             description: "Contact's name"
             type: string
-            example: 'Kate Turchynska'
+            example: 'Zhanna Suianina'
           phoneNumber:
             description: "Contact's number"
             type: string
-            example: '+3807635635'
+            example: '+380980185554'
           contactType:
             description: 'Contact type'
             type: string
@@ -33,7 +33,7 @@ requestBody:
           email:
             description: "Contact's email"
             type: string
-            example: 'drop2093@gmail.com'
+            example: 'cezyby3@gmail.com'
           isFavourite:
             description: 'Favorite contact'
             type: boolean
@@ -59,7 +59,7 @@ responses:
               example: 200
             message:
               type: string
-              example: Successfully updated contact with id 65ca67e7ae7f10c88b598384!
+              example: Successfully updated contact with id 68669484d906fbed3620f7b5!
             data:
               type: object
               $ref: ../../../components/schemas/contact.yaml

@@ -8,7 +8,7 @@ properties:
   _id:
     description: "Contact's id"
     type: string
-    example: 65e4decdd286b30065d54af9
+    example: '68669484d906fbed3620f7b5'
   name:
     description: "Contact's name"
     type: string
@@ -16,11 +16,11 @@ properties:
   phoneNumber:
     description: "Contact's number"
     type: string
-    example: '+38073698273'
+    example: '+380980185554'
   email:
     description: "Contact's email"
     type: string
-    example: 'drop2093@gmail.com'
+    example: 'cezyby3@gmail.com'
   contactType:
     description: "Contacts's type"
     type: string
@@ -32,8 +32,8 @@ properties:
   userId:
     description: "Contact's user id"
     type: string
-    example: 65e4decdd286b30065d54af9
+    example: '68669484d906fbed3620f7b5'
   photo:
     description: "Link to contacts's photo"
     type: string
-    example: https://res.cloudinary.com/dyzsarebb/image/upload/v1732893802/priroda74_074_ugnxjy.jpg
+    example: https://res.cloudinary.com/dypusvd55/image/upload/v1752056159/w37shxwdetharukoowwf.jpg

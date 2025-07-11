@@ -11,7 +11,7 @@ parameters:
     required: true
     schema:
       type: string
-      example: '65ca67e7ae7f10c88b598384'
+      example: '68669484d906fbed3620f7b5'
 responses:
   '200':
     description: 'Delete contact by id'

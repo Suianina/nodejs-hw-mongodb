@@ -18,11 +18,11 @@ requestBody:
           name:
             description: "Contact's name"
             type: string
-            example: 'Kate Turchynska'
+            example: 'Zhanna Suianina'
           phoneNumber:
             description: "Contact's number"
             type: string
-            example: '+38064349561'
+            example: '+380980185554'
           contactType:
             description: 'Contact type'
             type: string
@@ -30,7 +30,7 @@ requestBody:
           email:
             description: "Contact's email"
             type: string
-            example: 'drop2093@gmail.com'
+            example: 'cezyby3@gmail.com'
           isFavourite:
             description: 'Favorite contact'
             type: boolean
