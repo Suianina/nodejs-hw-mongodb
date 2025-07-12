@@ -7,10 +7,11 @@ import {
   loginUserSchema,
   requestResetEmailSchema,
   resetPasswordSchema,
-  authorizeWithGoogleOAuthValidationSchema,
 } from '../validation/auth.js';
 
+import { authorizeWithGoogleOAuthValidationSchema } from '../validation/googleOAuthSchemas.js';
 import * as authControllers from '../controllers/auth.js';
+import * as googleAuthControllers from '../controllers/googleAuth.js';
 
 const authRouter = Router();
 
@@ -47,13 +48,13 @@ authRouter.post(
 
 authRouter.post(
   '/get-google-oauth-link',
-  ctrlWrapper(authControllers.getGoogleOauthUrlController),
+  ctrlWrapper(googleAuthControllers.getGoogleOauthUrlController),
 );
 
 authRouter.post(
   '/authorize-with-google-oauth',
   validateBody(authorizeWithGoogleOAuthValidationSchema),
-  ctrlWrapper(authControllers.authorizeWithGoogleController),
+  ctrlWrapper(googleAuthControllers.authorizeWithGoogleController),
 );
 
 export default authRouter;

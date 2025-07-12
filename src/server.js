@@ -15,7 +15,7 @@ import { swaggerDocs } from './middlewares/swaggerDocs.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const PORT = Number(env('PORT', '3040'));
+const PORT = Number(env('PORT', '3000'));
 
 export const setupServer = () => {
   const app = express();

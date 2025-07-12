@@ -5,10 +5,7 @@ import {
   logoutUser,
   requestResetToken,
   resetPassword,
-  authorizeWithGoogleOauth,
 } from '../services/auth.js';
-
-import { getGoogleOAuthUrl } from '../services/googleAuth.js';
 
 import { SEVEN_DAY } from '../constants/index.js';
 
@@ -112,30 +109,4 @@ export const resetPasswordController = async (req, res) => {
       });
     }
   }
-};
-
-export const getGoogleOauthUrlController = (req, res) => {
-  const url = getGoogleOAuthUrl();
-
-  res.json({
-    status: 200,
-    message: 'Successfully obtained Google auth URL!',
-    data: {
-      url,
-    },
-  });
-};
-
-export const authorizeWithGoogleController = async (req, res) => {
-  const session = await authorizeWithGoogleOauth(req.body.code);
-
-  sessionFunc(res, session);
-
-  res.json({
-    status: 200,
-    message: 'Successfully logged in user with Google OAuth!',
-    data: {
-      accessToken: session.accessToken,
-    },
-  });
 };

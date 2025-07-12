@@ -11,7 +11,7 @@ import {
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseFilterParams } from '../utils/parseFilterParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
-import { uploadToCloudinary } from '../utils/uploadToCloudinary.js';
+import { uploadContactPhoto } from '../services/fileUploadService.js';
 
 export const getContactsController = async (req, res) => {
   const { page, perPage } = parsePaginationParams(req.query);
@@ -60,19 +60,9 @@ export const addContactController = async (req, res, next) => {
     console.log('addContactController: req.body:', req.body);
     console.log('addContactController: req.file:', req.file);
     const { _id: userId } = req.user;
-    let photoUrl = null;
-    if (req.file) {
-      try {
-        photoUrl = await uploadToCloudinary(req.file);
-        console.log('addContactController: photoUrl after upload:', photoUrl);
-      } catch (uploadErr) {
-        console.error(
-          'addContactController: Error uploading to Cloudinary:',
-          uploadErr,
-        );
-        throw uploadErr;
-      }
-    }
+
+    const photoUrl = await uploadContactPhoto(req.file);
+
     const data = {
       ...req.body,
       userId,
@@ -95,10 +85,9 @@ export const patchContactController = async (req, res, next) => {
   try {
     const { contactId } = req.params;
     const userId = req.user?._id;
-    let photoUrl;
-    if (req.file) {
-      photoUrl = await uploadToCloudinary(req.file);
-    }
+
+    const photoUrl = await uploadContactPhoto(req.file);
+
     const updatedContact = await updateContact(
       contactId,
       {
