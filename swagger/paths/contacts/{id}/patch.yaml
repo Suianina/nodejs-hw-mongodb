@@ -3,8 +3,6 @@ tags:
 summary: Update contact by ID
 operationId: updateContactById
 description: Update a specific contact by its ID
-security:
-  - bearerAuth: []
 parameters:
   - in: path
     name: id

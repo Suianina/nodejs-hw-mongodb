@@ -3,8 +3,6 @@ tags:
 summary: Create a new contact
 operationId: createContact
 description: Create a new contact for the authenticated user
-security:
-  - bearerAuth: []
 requestBody:
   required: true
   content:

@@ -29,3 +29,5 @@ export const CLOUDINARY = {
 export const ENABLE_CLOUDINARY = process.env.ENABLE_CLOUDINARY || 'false';
 
 export const emailRegex = /^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/;
+
+export const SWAGGER_PATH = path.join(process.cwd(), 'docs', 'swagger.json');

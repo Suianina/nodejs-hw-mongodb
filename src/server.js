@@ -8,8 +8,10 @@ import { env } from './utils/env.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { logger } from './middlewares/logger.js';
+import { swaggerDoc } from './middlewares/swaggerDocs.js';
 import router from './routers/index.js';
 import { UPLOAD_DIR } from './constants/index.js';
+import swaggerUI from 'swagger-ui-express';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -26,6 +28,7 @@ export const setupServer = () => {
   app.use(cors());
   app.use(cookieParser());
   app.use('/uploads', express.static(UPLOAD_DIR));
+  app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDoc));
   app.use(logger);
 
   app.get('/', (req, res) => {

@@ -13,12 +13,9 @@
     {
       "url": "https://nodejs-hw-mongodb-2-6e55.onrender.com",
       "description": "Production server (Render)"
-    },
-    {
-      "url": "http://localhost:3000",
-      "description": "Local development server"
     }
   ],
+  "security": [],
   "tags": [
     {
       "name": "Contacts",
@@ -77,48 +74,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "example": 201
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Successfully registered user!"
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "_id": {
-                          "type": "string",
-                          "pattern": "^[0-9a-fA-F]{24}$",
-                          "example": "68669484d906fbed3620f7b5"
-                        },
-                        "name": {
-                          "type": "string",
-                          "minLength": 3,
-                          "maxLength": 30,
-                          "example": "Zhanna Suianina"
-                        },
-                        "email": {
-                          "type": "string",
-                          "format": "email",
-                          "example": "cezyby3@gmail.com"
-                        },
-                        "createdAt": {
-                          "type": "string",
-                          "format": "date-time",
-                          "example": "2024-01-15T10:30:00.000Z"
-                        },
-                        "updatedAt": {
-                          "type": "string",
-                          "format": "date-time",
-                          "example": "2024-01-15T10:30:00.000Z"
-                        }
-                      }
-                    }
-                  }
+                  "$ref": "#/components/schemas/authSchemas"
                 }
               }
             }
@@ -552,11 +508,6 @@
         "summary": "Get list of contacts",
         "operationId": "getContacts",
         "description": "Retrieve a paginated list of contacts with optional filters",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
         "parameters": [
           {
             "in": "query",
@@ -653,11 +604,6 @@
         "summary": "Create a new contact",
         "operationId": "createContact",
         "description": "Create a new contact for the authenticated user",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -728,11 +674,6 @@
         "summary": "Get contact by ID",
         "operationId": "getContactById",
         "description": "Retrieve a specific contact by its ID",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
         "parameters": [
           {
             "in": "path",
@@ -768,11 +709,6 @@
         "summary": "Update contact by ID",
         "operationId": "updateContactById",
         "description": "Update a specific contact by its ID",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
         "parameters": [
           {
             "in": "path",
@@ -845,11 +781,6 @@
         "summary": "Delete contact by ID",
         "operationId": "deleteContactById",
         "description": "Delete a specific contact by its ID",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
         "parameters": [
           {
             "in": "path",
@@ -900,6 +831,42 @@
       "user": {
         "$ref": "#/components/schemas/authSchemas"
       },
+      "authSchemas": {
+        "type": "object",
+        "required": [
+          "_id",
+          "name",
+          "email"
+        ],
+        "properties": {
+          "_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$",
+            "example": "68669484d906fbed3620f7b5"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 30,
+            "example": "Zhanna Suianina"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "cezyby3@gmail.com"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-15T10:30:00.000Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-15T10:30:00.000Z"
+          }
+        }
+      },
       "schemas": {
         "type": "object",
         "required": [
@@ -945,42 +912,6 @@
           "photo": {
             "type": "string",
             "example": "https://res.cloudinary.com/dypusvd55/image/upload/v1752056159/w37shxwdetharukoowwf.jpg"
-          }
-        }
-      },
-      "authSchemas": {
-        "type": "object",
-        "required": [
-          "_id",
-          "name",
-          "email"
-        ],
-        "properties": {
-          "_id": {
-            "type": "string",
-            "pattern": "^[0-9a-fA-F]{24}$",
-            "example": "68669484d906fbed3620f7b5"
-          },
-          "name": {
-            "type": "string",
-            "minLength": 3,
-            "maxLength": 30,
-            "example": "Zhanna Suianina"
-          },
-          "email": {
-            "type": "string",
-            "format": "email",
-            "example": "cezyby3@gmail.com"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2024-01-15T10:30:00.000Z"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2024-01-15T10:30:00.000Z"
           }
         }
       }

@@ -14,8 +14,7 @@ tags:
 servers:
   - url: https://nodejs-hw-mongodb-2-6e55.onrender.com
     description: Production server (Render)
-  - url: http://localhost:3000
-    description: Local development server
+security: []
 paths:
   /auth/register:
     post:

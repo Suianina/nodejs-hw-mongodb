@@ -3,8 +3,6 @@ tags:
 summary: Delete contact by ID
 operationId: deleteContactById
 description: Delete a specific contact by its ID
-security:
-  - bearerAuth: []
 parameters:
   - in: path
     name: id
