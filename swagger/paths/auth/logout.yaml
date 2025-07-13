@@ -1,0 +1,22 @@
+tags:
+  - Auth
+summary: Logout user
+operationId: logoutUser
+description: Logout user and invalidate session
+security: []
+responses:
+  '200':
+    description: User logged out successfully
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: 'Successfully logged out'
+  '401':
+    description: Unauthorized - invalid session

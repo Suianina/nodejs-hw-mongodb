@@ -1,0 +1,28 @@
+tags:
+  - Auth
+summary: Refresh access token
+operationId: refreshToken
+description: Refresh the access token using the refresh token from cookies
+security: []
+responses:
+  '200':
+    description: Token refreshed successfully
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: 'Token refreshed successfully'
+            data:
+              type: object
+              properties:
+                accessToken:
+                  type: string
+                  example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODY2OTQ4NGQ5MDZmYmVkMzYyMGY3YjUiLCJpYXQiOjE3NTIwNTYxNTksImV4cCI6MTc1MjA1OTc1OX0.example'
+  '401':
+    description: Unauthorized - invalid or expired refresh token
