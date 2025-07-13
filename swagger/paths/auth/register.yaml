@@ -1,0 +1,72 @@
+tags:
+  - Auth
+summary: Register a new user
+operationId: registerUser
+description: Create a new user account with name, email, and password
+security: []
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - name
+          - email
+          - password
+        properties:
+          name:
+            type: string
+            minLength: 3
+            maxLength: 30
+            example: 'Zhanna Suianina'
+          email:
+            type: string
+            format: email
+            example: 'cezyby3@gmail.com'
+          password:
+            type: string
+            example: 'password123'
+responses:
+  '201':
+    description: User registered successfully
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: integer
+              example: 201
+            message:
+              type: string
+              example: 'Successfully registered user!'
+            data:
+              type: object
+              properties:
+                _id:
+                  type: string
+                  pattern: '^[0-9a-fA-F]{24}$'
+                  example: '68669484d906fbed3620f7b5'
+                name:
+                  type: string
+                  minLength: 3
+                  maxLength: 30
+                  example: 'Zhanna Suianina'
+                email:
+                  type: string
+                  format: email
+                  example: 'cezyby3@gmail.com'
+                createdAt:
+                  type: string
+                  format: date-time
+                  example: '2024-01-15T10:30:00.000Z'
+                updatedAt:
+                  type: string
+                  format: date-time
+                  example: '2024-01-15T10:30:00.000Z'
+
+  '400':
+    description: Bad request - validation error
+  '409':
+    description: Conflict - user already exists

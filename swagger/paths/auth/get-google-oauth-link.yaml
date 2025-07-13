@@ -1,0 +1,30 @@
+tags:
+  - Auth
+summary: Get Google OAuth URL
+operationId: getGoogleOAuthLink
+description: Get the Google OAuth authorization URL for user authentication
+security: []
+responses:
+  '200':
+    description: Google OAuth link generated successfully
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: 'Google OAuth link generated successfully'
+            data:
+              type: object
+              properties:
+                url:
+                  type: string
+                  example: 'https://accounts.google.com/o/oauth2/auth?...'
+  '401':
+    description: Unauthorized - user is not authenticated
+  '500':
+    description: Internal server error

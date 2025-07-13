@@ -30,6 +30,25 @@ export const setupServer = () => {
   app.use('/api-docs', swaggerDocs());
   app.use(logger);
 
+  app.get('/confirm-google-auth', (req, res) => {
+    console.log('Google OAuth callback route hit!');
+    console.log('Query params:', req.query);
+
+    const { code } = req.query;
+
+    if (!code) {
+      console.log('No code found in query');
+      return res.status(400).send('Code not found in query');
+    }
+
+    console.log('Code found:', code);
+    res.send(`
+      <h1>Google OAuth Code</h1>
+      <p>Copy this code and paste it into the request <code>POST /auth/authorize-with-google-oauth</code></p>
+      <code>${code}</code>
+    `);
+  });
+
   app.get('/', (req, res) => {
     res.json({
       message: 'Contacts API is running',

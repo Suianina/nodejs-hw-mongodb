@@ -6,10 +6,13 @@ import { SWAGGER_PATH } from '../constants/index.js';
 
 export const swaggerDocs = () => {
   try {
+    console.log('Loading swagger docs from:', SWAGGER_PATH);
     const swaggerDoc = JSON.parse(fs.readFileSync(SWAGGER_PATH).toString());
+    console.log('Swagger docs loaded successfully');
     return [swaggerUI.serve, swaggerUI.setup(swaggerDoc)];
   } catch (err) {
     console.error('Swagger load error:', err);
+    console.error('Error details:', err.message);
     return (req, res, next) =>
       next(createHttpError(500, "Can't load swagger docs"));
   }

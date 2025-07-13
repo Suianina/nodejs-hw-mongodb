@@ -2,17 +2,45 @@ openapi: 3.1.0
 info:
   title: Contacts API
   version: 1.0.0
-  description: API for managing user contacts
+  description: API for managing user contacts and authentication
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 tags:
   - name: Contacts
     description: Operations for managing user contacts
+  - name: Auth
+    description: Authentication and authorization operations
 servers:
   - url: https://nodejs-hw-mongodb-2-6e55.onrender.com
     description: Production server (Render)
+  - url: http://localhost:3000
+    description: Local development server
 paths:
+  /auth/register:
+    post:
+      $ref: '../swagger/paths/auth/register.yaml'
+  /auth/login:
+    post:
+      $ref: '../swagger/paths/auth/login.yaml'
+  /auth/refresh:
+    post:
+      $ref: '../swagger/paths/auth/refresh.yaml'
+  /auth/logout:
+    post:
+      $ref: '../swagger/paths/auth/logout.yaml'
+  /auth/send-reset-email:
+    post:
+      $ref: '../swagger/paths/auth/send-reset-email.yaml'
+  /auth/reset-pwd:
+    post:
+      $ref: '../swagger/paths/auth/reset-pwd.yaml'
+  /auth/get-google-oauth-link:
+    post:
+      $ref: '../swagger/paths/auth/get-google-oauth-link.yaml'
+  /auth/authorize-with-google-oauth:
+    post:
+      $ref: '../swagger/paths/auth/authorize-with-google-oauth.yaml'
   /contacts:
     get:
       $ref: '../swagger/paths/contacts/get.yaml'
@@ -33,6 +61,8 @@ components:
   schemas:
     contact:
       $ref: '../swagger/components/schemas.yaml'
+    user:
+      $ref: '../swagger/components/authSchemas.yaml'
   responses:
     NotFound:
       $ref: '../swagger/components/responses.yaml'
