@@ -17,7 +17,7 @@ import swaggerUI from 'swagger-ui-express';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const PORT = Number(env('PORT', '3040'));
+const PORT = Number(env('PORT', '3000'));
 
 export const setupServer = () => {
   const app = express();
@@ -26,7 +26,12 @@ export const setupServer = () => {
   app.set('views', path.join(__dirname, 'views'));
 
   app.use(express.json());
-  app.use(cors());
+  app.use(
+    cors({
+      origin: true,
+      credentials: true,
+    }),
+  );
   app.use(cookieParser());
   app.use('/uploads', express.static(UPLOAD_DIR));
   app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDoc));
@@ -44,8 +49,9 @@ export const setupServer = () => {
     res.send(html);
   });
 
-  app.get('/health', (_, res) => {
-    res.status(200).json({ status: 'ok' });
+  app.get('/health', (req, res) => {
+    console.log('Health check requested');
+    res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
   });
 
   app.use(logger);
@@ -59,7 +65,7 @@ export const setupServer = () => {
   app.use(errorHandler);
 
   const server = app.listen(PORT, () => {
-    console.log(`🚀 Server is running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
   });
 
   return server;
