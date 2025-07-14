@@ -30,7 +30,7 @@ contact:
       example: '68669484d906fbed3620f7b5'
     photo:
       type: string
-      example: 'https://res.cloudinary.com/demo/image/upload/photo.jpg'
+      example: 'https://res.cloudinary.com/dypusvd55/image/upload/v1752056159/w37shxwdetharukoowwf.jpg'
 
 user:
   type: object
@@ -41,6 +41,7 @@ user:
   properties:
     _id:
       type: string
+      pattern: '^[0-9a-fA-F]{24}$'
       example: '68669484d906fbed3620f7b5'
     name:
       type: string

@@ -33,7 +33,7 @@ responses:
     content:
       application/json:
         schema:
-          $ref: '../../components/authSchemas.yaml'
+          $ref: '#/components/schemas/user'
   '400':
     description: Bad request - validation error
   '409':

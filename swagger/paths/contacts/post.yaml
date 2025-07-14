@@ -36,7 +36,7 @@ responses:
     content:
       application/json:
         schema:
-          $ref: '../../components/schemas.yaml'
+          $ref: '#/components/schemas/contact'
   '400':
     description: Bad request
   '401':

@@ -17,6 +17,6 @@ responses:
     content:
       application/json:
         schema:
-          $ref: '../../../components/schemas.yaml'
+          $ref: '#/components/schemas/contact'
   '404':
-    $ref: '../../../components/responses.yaml'
+    $ref: '#/components/responses/NotFound'

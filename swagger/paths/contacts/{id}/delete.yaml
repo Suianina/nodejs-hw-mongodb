@@ -23,4 +23,4 @@ responses:
               type: string
               example: 'Contact deleted successfully'
   '404':
-    $ref: '../../../components/responses.yaml'
+    $ref: '#/components/responses/NotFound'
