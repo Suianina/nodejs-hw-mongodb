@@ -6,15 +6,19 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
+
 tags:
-  - name: Contacts
-    description: Operations for managing user contacts
   - name: Auth
     description: Authentication and authorization operations
+  - name: Contacts
+    description: Operations for managing user contacts
+
 servers:
+  - url: http://localhost:3000
+    description: Local development server
   - url: https://nodejs-hw-mongodb-2-6e55.onrender.com
     description: Production server (Render)
-security: []
+
 paths:
   /auth/register:
     post:
@@ -22,12 +26,12 @@ paths:
   /auth/login:
     post:
       $ref: '../swagger/paths/auth/login.yaml'
-  /auth/refresh:
-    post:
-      $ref: '../swagger/paths/auth/refresh.yaml'
   /auth/logout:
     post:
       $ref: '../swagger/paths/auth/logout.yaml'
+  /auth/refresh:
+    post:
+      $ref: '../swagger/paths/auth/refresh.yaml'
   /auth/send-reset-email:
     post:
       $ref: '../swagger/paths/auth/send-reset-email.yaml'
@@ -40,11 +44,13 @@ paths:
   /auth/authorize-with-google-oauth:
     post:
       $ref: '../swagger/paths/auth/authorize-with-google-oauth.yaml'
+
   /contacts:
     get:
       $ref: '../swagger/paths/contacts/get.yaml'
     post:
       $ref: '../swagger/paths/contacts/post.yaml'
+
   /contacts/{id}:
     get:
       $ref: '../swagger/paths/contacts/{id}/get.yaml'
@@ -52,6 +58,7 @@ paths:
       $ref: '../swagger/paths/contacts/{id}/patch.yaml'
     delete:
       $ref: '../swagger/paths/contacts/{id}/delete.yaml'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -59,9 +66,9 @@ components:
       scheme: bearer
   schemas:
     contact:
-      $ref: '../swagger/components/schemas.yaml'
+      $ref: '../swagger/components/schemas.yaml#/contact'
     user:
-      $ref: '../swagger/components/authSchemas.yaml'
+      $ref: '../swagger/components/authSchemas.yaml#/user'
   responses:
     NotFound:
       $ref: '../swagger/components/responses.yaml'
