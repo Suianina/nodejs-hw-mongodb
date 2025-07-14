@@ -13,12 +13,18 @@
     {
       "url": "https://nodejs-hw-mongodb-2-6e55.onrender.com",
       "description": "Production server (Render)"
+<<<<<<< HEAD
     },
     {
       "url": "http://localhost:3000",
       "description": "Local development server"
     }
   ],
+=======
+    }
+  ],
+  "security": [],
+>>>>>>> hw7-swagger
   "tags": [
     {
       "name": "Contacts",
@@ -77,6 +83,7 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "type": "object",
                   "properties": {
                     "status": {
@@ -119,6 +126,9 @@
                       }
                     }
                   }
+=======
+                  "$ref": "#/components/schemas/user"
+>>>>>>> hw7-swagger
                 }
               }
             }
@@ -214,6 +224,45 @@
         }
       }
     },
+<<<<<<< HEAD
+=======
+    "/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Logout user",
+        "operationId": "logoutUser",
+        "description": "Logout user and invalidate session",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "User logged out successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully logged out"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - invalid session"
+          }
+        }
+      }
+    },
+>>>>>>> hw7-swagger
     "/auth/refresh": {
       "post": {
         "tags": [
@@ -259,6 +308,7 @@
         }
       }
     },
+<<<<<<< HEAD
     "/auth/logout": {
       "post": {
         "tags": [
@@ -354,6 +404,8 @@
         }
       }
     },
+=======
+>>>>>>> hw7-swagger
     "/auth/reset-pwd": {
       "post": {
         "tags": [
@@ -417,6 +469,68 @@
         }
       }
     },
+<<<<<<< HEAD
+=======
+    "/auth/send-reset-email": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Send password reset email",
+        "operationId": "sendResetEmail",
+        "description": "Send a password reset email to the specified email address",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "cezyby3@gmail.com"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Reset email sent successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Password reset email sent successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - validation error"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+>>>>>>> hw7-swagger
     "/auth/get-google-oauth-link": {
       "post": {
         "tags": [
@@ -552,11 +666,14 @@
         "summary": "Get list of contacts",
         "operationId": "getContacts",
         "description": "Retrieve a paginated list of contacts with optional filters",
+<<<<<<< HEAD
         "security": [
           {
             "bearerAuth": []
           }
         ],
+=======
+>>>>>>> hw7-swagger
         "parameters": [
           {
             "in": "query",
@@ -633,7 +750,11 @@
                     "data": {
                       "type": "array",
                       "items": {
+<<<<<<< HEAD
                         "$ref": "#/components/schemas/schemas"
+=======
+                        "$ref": "#/components/schemas/contact"
+>>>>>>> hw7-swagger
                       }
                     }
                   }
@@ -642,7 +763,11 @@
             }
           },
           "404": {
+<<<<<<< HEAD
             "$ref": "#/components/responses/responses"
+=======
+            "$ref": "#/components/responses/NotFound"
+>>>>>>> hw7-swagger
           }
         }
       },
@@ -653,11 +778,14 @@
         "summary": "Create a new contact",
         "operationId": "createContact",
         "description": "Create a new contact for the authenticated user",
+<<<<<<< HEAD
         "security": [
           {
             "bearerAuth": []
           }
         ],
+=======
+>>>>>>> hw7-swagger
         "requestBody": {
           "required": true,
           "content": {
@@ -706,7 +834,11 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/schemas"
+=======
+                  "$ref": "#/components/schemas/contact"
+>>>>>>> hw7-swagger
                 }
               }
             }
@@ -728,11 +860,14 @@
         "summary": "Get contact by ID",
         "operationId": "getContactById",
         "description": "Retrieve a specific contact by its ID",
+<<<<<<< HEAD
         "security": [
           {
             "bearerAuth": []
           }
         ],
+=======
+>>>>>>> hw7-swagger
         "parameters": [
           {
             "in": "path",
@@ -751,13 +886,21 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/schemas"
+=======
+                  "$ref": "#/components/schemas/contact"
+>>>>>>> hw7-swagger
                 }
               }
             }
           },
           "404": {
+<<<<<<< HEAD
             "$ref": "#/components/responses/responses"
+=======
+            "$ref": "#/components/responses/NotFound"
+>>>>>>> hw7-swagger
           }
         }
       },
@@ -768,11 +911,14 @@
         "summary": "Update contact by ID",
         "operationId": "updateContactById",
         "description": "Update a specific contact by its ID",
+<<<<<<< HEAD
         "security": [
           {
             "bearerAuth": []
           }
         ],
+=======
+>>>>>>> hw7-swagger
         "parameters": [
           {
             "in": "path",
@@ -828,13 +974,21 @@
             "content": {
               "application/json": {
                 "schema": {
+<<<<<<< HEAD
                   "$ref": "#/components/schemas/schemas"
+=======
+                  "$ref": "#/components/schemas/contact"
+>>>>>>> hw7-swagger
                 }
               }
             }
           },
           "404": {
+<<<<<<< HEAD
             "$ref": "#/components/responses/responses"
+=======
+            "$ref": "#/components/responses/NotFound"
+>>>>>>> hw7-swagger
           }
         }
       },
@@ -845,11 +999,14 @@
         "summary": "Delete contact by ID",
         "operationId": "deleteContactById",
         "description": "Delete a specific contact by its ID",
+<<<<<<< HEAD
         "security": [
           {
             "bearerAuth": []
           }
         ],
+=======
+>>>>>>> hw7-swagger
         "parameters": [
           {
             "in": "path",
@@ -880,7 +1037,11 @@
             }
           },
           "404": {
+<<<<<<< HEAD
             "$ref": "#/components/responses/responses"
+=======
+            "$ref": "#/components/responses/NotFound"
+>>>>>>> hw7-swagger
           }
         }
       }
@@ -895,12 +1056,15 @@
     },
     "schemas": {
       "contact": {
+<<<<<<< HEAD
         "$ref": "#/components/schemas/schemas"
       },
       "user": {
         "$ref": "#/components/schemas/authSchemas"
       },
       "schemas": {
+=======
+>>>>>>> hw7-swagger
         "type": "object",
         "required": [
           "_id",
@@ -948,7 +1112,11 @@
           }
         }
       },
+<<<<<<< HEAD
       "authSchemas": {
+=======
+      "user": {
+>>>>>>> hw7-swagger
         "type": "object",
         "required": [
           "_id",
@@ -987,9 +1155,12 @@
     },
     "responses": {
       "NotFound": {
+<<<<<<< HEAD
         "$ref": "#/components/responses/responses"
       },
       "responses": {
+=======
+>>>>>>> hw7-swagger
         "description": "Not Found",
         "content": {
           "application/json": {
@@ -1002,7 +1173,11 @@
                 },
                 "message": {
                   "type": "string",
+<<<<<<< HEAD
                   "example": "Contact not found"
+=======
+                  "example": "Resource not found"
+>>>>>>> hw7-swagger
                 }
               }
             }

@@ -3,8 +3,11 @@ tags:
 summary: Update contact by ID
 operationId: updateContactById
 description: Update a specific contact by its ID
+<<<<<<< HEAD
 security:
   - bearerAuth: []
+=======
+>>>>>>> hw7-swagger
 parameters:
   - in: path
     name: id
@@ -42,6 +45,12 @@ responses:
     content:
       application/json:
         schema:
+<<<<<<< HEAD
           $ref: '../../../components/schemas.yaml'
   '404':
     $ref: '../../../components/responses.yaml'
+=======
+          $ref: '#/components/schemas/contact'
+  '404':
+    $ref: '#/components/responses/NotFound'
+>>>>>>> hw7-swagger

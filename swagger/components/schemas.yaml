@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 type: object
 required:
   - _id
@@ -30,3 +31,67 @@ properties:
   photo:
     type: string
     example: 'https://res.cloudinary.com/dypusvd55/image/upload/v1752056159/w37shxwdetharukoowwf.jpg'
+=======
+contact:
+  type: object
+  required:
+    - _id
+    - name
+    - phoneNumber
+    - contactType
+  properties:
+    _id:
+      type: string
+      pattern: '^[0-9a-fA-F]{24}$'
+      example: '68669484d906fbed3620f7b5'
+    name:
+      type: string
+      example: 'Zhanna Suianina'
+    phoneNumber:
+      type: string
+      example: '+380980185554'
+    email:
+      type: string
+      example: 'cezyby3@gmail.com'
+    contactType:
+      type: string
+      enum: [work, home, personal]
+    isFavorite:
+      type: boolean
+      example: false
+    userId:
+      type: string
+      example: '68669484d906fbed3620f7b5'
+    photo:
+      type: string
+      example: 'https://res.cloudinary.com/dypusvd55/image/upload/v1752056159/w37shxwdetharukoowwf.jpg'
+
+user:
+  type: object
+  required:
+    - _id
+    - name
+    - email
+  properties:
+    _id:
+      type: string
+      pattern: '^[0-9a-fA-F]{24}$'
+      example: '68669484d906fbed3620f7b5'
+    name:
+      type: string
+      minLength: 3
+      maxLength: 30
+      example: 'Zhanna Suianina'
+    email:
+      type: string
+      format: email
+      example: 'cezyby3@gmail.com'
+    createdAt:
+      type: string
+      format: date-time
+      example: '2024-01-15T10:30:00.000Z'
+    updatedAt:
+      type: string
+      format: date-time
+      example: '2024-01-15T10:30:00.000Z'
+>>>>>>> hw7-swagger

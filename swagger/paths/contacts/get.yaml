@@ -3,8 +3,11 @@ tags:
 summary: Get list of contacts
 operationId: getContacts
 description: Retrieve a paginated list of contacts with optional filters
+<<<<<<< HEAD
 security:
   - bearerAuth: []
+=======
+>>>>>>> hw7-swagger
 parameters:
   - in: query
     name: page
@@ -50,6 +53,12 @@ responses:
             data:
               type: array
               items:
+<<<<<<< HEAD
                 $ref: '../../components/schemas.yaml'
   '404':
     $ref: '../../components/responses.yaml'
+=======
+                $ref: '#/components/schemas/contact'
+  '404':
+    $ref: '#/components/responses/NotFound'
+>>>>>>> hw7-swagger

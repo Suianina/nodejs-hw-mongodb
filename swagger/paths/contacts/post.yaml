@@ -3,8 +3,11 @@ tags:
 summary: Create a new contact
 operationId: createContact
 description: Create a new contact for the authenticated user
+<<<<<<< HEAD
 security:
   - bearerAuth: []
+=======
+>>>>>>> hw7-swagger
 requestBody:
   required: true
   content:
@@ -38,7 +41,11 @@ responses:
     content:
       application/json:
         schema:
+<<<<<<< HEAD
           $ref: '../../components/schemas.yaml'
+=======
+          $ref: '#/components/schemas/contact'
+>>>>>>> hw7-swagger
   '400':
     description: Bad request
   '401':
