@@ -15,4 +15,4 @@ responses:
   '204':
     description: Contact deleted successfully. No content is returned.
   '404':
-    $ref: '#/components/responses/NotFound'
+  $ref: '../../../docs/openapi.yaml#/components/responses/NotFound'
