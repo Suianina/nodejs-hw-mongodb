@@ -3,11 +3,8 @@ tags:
 summary: Delete contact by ID
 operationId: deleteContactById
 description: Delete a specific contact by its ID
-<<<<<<< HEAD
 security:
   - bearerAuth: []
-=======
->>>>>>> hw7-swagger
 parameters:
   - in: path
     name: id
@@ -17,19 +14,7 @@ parameters:
       pattern: '^[0-9a-fA-F]{24}$'
     description: Contact ID
 responses:
-  '200':
-    description: Contact deleted successfully
-    content:
-      application/json:
-        schema:
-          type: object
-          properties:
-            message:
-              type: string
-              example: 'Contact deleted successfully'
+  '204':
+    description: Contact deleted successfully. No content is returned.
   '404':
-<<<<<<< HEAD
-    $ref: '../../../components/responses.yaml'
-=======
     $ref: '#/components/responses/NotFound'
->>>>>>> hw7-swagger
